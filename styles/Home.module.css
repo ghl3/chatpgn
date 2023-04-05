@@ -86,11 +86,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #282828;
+  background-color: #1e1e1e;
   padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #3a3a3a;
 }
 
 .siteTitle {
