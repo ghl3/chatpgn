@@ -15,7 +15,7 @@ export default function Home() {
     <>
       <Head>
         <title>ChatPGN</title>
-        <meta name="description" content="Text and file input example" />
+        <meta name="description" content="Text and file input" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -23,7 +23,7 @@ export default function Home() {
         <h1 className={styles.siteTitle}>ChatPGN</h1>
       </header>
       <main className={styles.main}>
-        <h1 className={styles.h1}>Text and File Input Example</h1>
+        <h1 className={styles.h1}>Upload your PGN below</h1>
         <FileInputForm onSubmit={handleFormSubmit} />
       </main>
     </>

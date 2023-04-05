@@ -1,3 +1,5 @@
+/* styles/FileInputForm.module.css */
+
 .formGroup {
     display: flex;
     flex-direction: column;
@@ -11,10 +13,14 @@
 .textArea {
     resize: none;
     width: 100%;
+    /* Updated width */
     height: 150px;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    outline: none;
 }
 
 .fileUpload {
