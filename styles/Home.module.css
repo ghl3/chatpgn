@@ -81,3 +81,21 @@
 .button:hover {
   background-color: #4aa4c4;
 }
+
+.siteHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #282828;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.siteTitle {
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
