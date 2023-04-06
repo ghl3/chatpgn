@@ -3,15 +3,26 @@ import Head from 'next/head';
 import FileInputForm from '../components/FileInputForm';
 import styles from '../styles/Home.module.css';
 import React, { ChangeEvent, FormEvent, useState } from 'react';
+import { parse } from 'pgn-parser';
 
+const parseAndAnnotatePgn = (pgnText: string) => {
+  try {
+    console.log("Parsing PGN: \n" + pgnText);
+    const parsedPgn = parse(pgnText);
+
+    console.log('Parsed PGN:', parsedPgn);
+  } catch (error) {
+    console.error('Error parsing PGN:', error);
+  }
+};
 
 export default function Home() {
 
   const [pgnText, setPgnText] = useState('');
 
-  const handleFormText = (text: string) => {
-    console.log('Text:', text);
-    setPgnText(text);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    parseAndAnnotatePgn(pgnText);
   };
 
   return (
@@ -27,10 +38,12 @@ export default function Home() {
       </header>
       <main className={styles.main}>
         <h1 className={styles.h1}>Add your PGN below</h1>
-        <FileInputForm handleFileText={handleFormText} />
-        <button type="submit" className={styles.button}>
-          Annotate PGN
-        </button>
+        <form onSubmit={handleSubmit}>
+          <FileInputForm textArea={pgnText} setTextArea={setPgnText} />
+          <button type="submit" className={styles.button}>
+            Annotate PGN
+          </button>
+        </form>
       </main>
     </>
   );

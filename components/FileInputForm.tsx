@@ -4,14 +4,15 @@ import React, { ChangeEvent, FormEvent, useState } from 'react';
 import styles from '../styles/FileInputForm.module.css';
 
 interface FileInputFormProps {
-    handleFileText: (text: string) => void;
+    textArea: string;
+    setTextArea: (text: string) => void;
 }
 
-const FileInputForm: React.FC<FileInputFormProps> = ({ handleFileText }) => {
-    const [textAreaValue, setTextAreaValue] = useState<string>('');
+const FileInputForm: React.FC<FileInputFormProps> = ({ textArea, setTextArea }) => {
+    //const [textAreaValue, setTextAreaValue] = useState<string>('');
 
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        setTextAreaValue(event.target.value);
+        setTextArea(event.target.value);
     };
 
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -19,16 +20,11 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ handleFileText }) => {
             const file = event.target.files[0];
             try {
                 const fileContents = await readFileAsText(file);
-                setTextAreaValue(fileContents);
+                setTextArea(fileContents);
             } catch (error) {
                 console.error('Error reading file:', error);
             }
         }
-    };
-
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        handleFileText(textAreaValue);
     };
 
     const readFileAsText = (file: File): Promise<string> => {
@@ -49,14 +45,15 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ handleFileText }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className={styles.form}>
+        // <form onSubmit={handleSubmit} className={styles.form}>
+        <>
             <div className={styles.formGroup}>
                 <label htmlFor="textArea" className={styles.label}>
                     Paste text or upload a file:
                 </label>
                 <textarea
                     id="textArea"
-                    value={textAreaValue}
+                    value={textArea}
                     onChange={handleTextAreaChange}
                     className={styles.textArea}
                 ></textarea>
@@ -70,7 +67,8 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ handleFileText }) => {
                     className={styles.fileUpload}
                 />
             </div>
-        </form>
+        </>
+        //  </form>
     );
 };
 
