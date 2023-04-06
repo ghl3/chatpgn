@@ -45,7 +45,6 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ textArea, setTextArea }) 
     };
 
     return (
-        // <form onSubmit={handleSubmit} className={styles.form}>
         <>
             <div className={styles.formGroup}>
                 <label htmlFor="textArea" className={styles.label}>
@@ -68,7 +67,6 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ textArea, setTextArea }) 
                 />
             </div>
         </>
-        //  </form>
     );
 };
 

@@ -1,24 +1,22 @@
 // pages/index.tsx
-import Head from 'next/head';
-import FileInputForm from '../components/FileInputForm';
-import styles from '../styles/Home.module.css';
-import React, { ChangeEvent, FormEvent, useState } from 'react';
-import { parse } from 'pgn-parser';
+import Head from "next/head";
+import FileInputForm from "../components/FileInputForm";
+import styles from "../styles/Home.module.css";
+import React, { ChangeEvent, FormEvent, useState } from "react";
+import { parse } from "pgn-parser";
 
 const parseAndAnnotatePgn = (pgnText: string) => {
   try {
     console.log("Parsing PGN: \n" + pgnText);
     const parsedPgn = parse(pgnText);
-
-    console.log('Parsed PGN:', parsedPgn);
+    console.log("Parsed PGN:", parsedPgn);
   } catch (error) {
-    console.error('Error parsing PGN:', error);
+    console.error("Error parsing PGN:", error);
   }
 };
 
 export default function Home() {
-
-  const [pgnText, setPgnText] = useState('');
+  const [pgnText, setPgnText] = useState("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
