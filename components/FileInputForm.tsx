@@ -4,11 +4,12 @@ import React, { ChangeEvent, FormEvent, useState } from 'react';
 import styles from '../styles/FileInputForm.module.css';
 
 interface FileInputFormProps {
-    onSubmit: (text: string, file: File | null) => void;
+    handleFileText: (text: string) => void;
 }
 
-const FileInputForm: React.FC<FileInputFormProps> = ({ onSubmit }) => {
-    const [textAreaValue, setTextAreaValue] = useState('');
+const FileInputForm: React.FC<FileInputFormProps> = ({ handleFileText }) => {
+
+    const [textAreaValue, setTextAreaValue] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -16,13 +17,30 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ onSubmit }) => {
     };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        setSelectedFile(file);
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            setSelectedFile(file);
+        }
     };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onSubmit(textAreaValue, selectedFile);
+
+        if (textAreaValue != null) {
+            handleFileText(textAreaValue);
+        } else if (selectedFile != null) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.result) {
+                    handleFileText(reader.result.toString());
+                } else {
+                    console.log("ERROR");
+                }
+            };
+            reader.readAsText(selectedFile);
+        } else {
+            throw new Error("Fuckabees");
+        }
     };
 
     return (
@@ -33,7 +51,7 @@ const FileInputForm: React.FC<FileInputFormProps> = ({ onSubmit }) => {
                 </label>
                 <textarea
                     id="textArea"
-                    value={textAreaValue}
+                    value={textAreaValue || ''}
                     onChange={handleTextAreaChange}
                     className={styles.textArea}
                 ></textarea>

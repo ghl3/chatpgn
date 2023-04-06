@@ -2,13 +2,16 @@
 import Head from 'next/head';
 import FileInputForm from '../components/FileInputForm';
 import styles from '../styles/Home.module.css';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 
 
 export default function Home() {
 
-  const handleFormSubmit = (text: string, file: File | null) => {
+  const [pgnText, setPgnText] = useState('');
+
+  const handleFormText = (text: string) => {
     console.log('Text:', text);
-    console.log('File:', file);
+    setPgnText(text);
   };
 
   return (
@@ -24,7 +27,7 @@ export default function Home() {
       </header>
       <main className={styles.main}>
         <h1 className={styles.h1}>Upload your PGN below</h1>
-        <FileInputForm onSubmit={handleFormSubmit} />
+        <FileInputForm handleFileText={handleFormText} />
       </main>
     </>
   );
