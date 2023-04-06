@@ -26,8 +26,11 @@ export default function Home() {
         <h1 className={styles.siteTitle}>ChatPGN</h1>
       </header>
       <main className={styles.main}>
-        <h1 className={styles.h1}>Upload your PGN below</h1>
+        <h1 className={styles.h1}>Add your PGN below</h1>
         <FileInputForm handleFileText={handleFormText} />
+        <button type="submit" className={styles.button}>
+          Annotate PGN
+        </button>
       </main>
     </>
   );
