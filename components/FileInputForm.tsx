@@ -11,8 +11,6 @@ const FileInputForm: React.FC<FileInputFormProps> = ({
   textArea,
   setTextArea,
 }) => {
-  //const [textAreaValue, setTextAreaValue] = useState<string>('');
-
   const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setTextArea(event.target.value);
   };

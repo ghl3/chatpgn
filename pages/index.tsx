@@ -3,13 +3,20 @@ import Head from "next/head";
 import FileInputForm from "../components/FileInputForm";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { parse } from "pgn-parser";
+import { ParsedPGN, parse } from "pgn-parser";
+import { chatGPT } from "../utils/chatgpt";
 
-const parseAndAnnotatePgn = (pgnText: string) => {
+const createPrompt = (pgn: ParsedPGN): string => {
+  return "foobar";
+};
+
+const parseAndAnnotatePgn = async (pgnText: string) => {
   try {
     console.log("Parsing PGN: \n" + pgnText);
-    const parsedPgn = parse(pgnText);
+    const parsedPgn: ParsedPGN = parse(pgnText)[0];
     console.log("Parsed PGN:", parsedPgn);
+    const annotatedPgn = await chatGPT(createPrompt(parsedPgn));
+    console.log("Annotated PGN:", annotatedPgn);
   } catch (error) {
     console.error("Error parsing PGN:", error);
   }
