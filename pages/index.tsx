@@ -1,6 +1,7 @@
 // pages/index.tsx
 import Head from "next/head";
 import FileInputForm from "../components/FileInputForm";
+import PersonaSelector from "../components/PersonaSelector";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParsedPGN, parse } from "pgn-parser";
@@ -50,21 +51,10 @@ export default function Home() {
         <h1 className={styles.h1}>Add your PGN below</h1>
         <form onSubmit={handleSubmit} className={styles.form}>
           <FileInputForm textArea={pgnText} setTextArea={setPgnText} />
-          <div className={styles.personaSelector}>
-            <label htmlFor="persona-selector">Persona:</label>
-            <select
-              id="persona-selector"
-              value={persona}
-              onChange={handlePersonaChange}
-              className={styles.personaDropdown}
-            >
-              <option value="Standard">Standard</option>
-              <option value="Gotham Chess">Gotham Chess</option>
-              <option value="Daniel Naroditsky">Daniel Naroditsky</option>
-              <option value="Hikaru">Hikaru</option>
-              <option value="Eric Rosen">Eric Rosen</option>
-            </select>
-          </div>
+          <PersonaSelector
+            persona={persona}
+            onPersonaChange={handlePersonaChange}
+          />
           <button type="submit" className={styles.button}>
             Annotate PGN
           </button>
