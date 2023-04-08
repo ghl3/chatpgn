@@ -20,9 +20,9 @@
 .form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   max-width: 100%;
-  /* Changed from 1600px to 100% */
 }
 
 .siteHeader {
@@ -51,4 +51,16 @@
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.2s ease;
+  margin-top: 1rem;
+}
+
+.personaSelector {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.personaDropdown {
+  margin-left: 10px;
 }

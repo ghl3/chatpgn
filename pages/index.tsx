@@ -24,10 +24,15 @@ const parseAndAnnotatePgn = async (pgnText: string) => {
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
+  const [persona, setPersona] = useState("Standard");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     parseAndAnnotatePgn(pgnText);
+  };
+
+  const handlePersonaChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setPersona(event.target.value);
   };
 
   return (
@@ -43,8 +48,23 @@ export default function Home() {
       </header>
       <main className={styles.main}>
         <h1 className={styles.h1}>Add your PGN below</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           <FileInputForm textArea={pgnText} setTextArea={setPgnText} />
+          <div className={styles.personaSelector}>
+            <label htmlFor="persona-selector">Persona:</label>
+            <select
+              id="persona-selector"
+              value={persona}
+              onChange={handlePersonaChange}
+              className={styles.personaDropdown}
+            >
+              <option value="Standard">Standard</option>
+              <option value="Gotham Chess">Gotham Chess</option>
+              <option value="Daniel Naroditsky">Daniel Naroditsky</option>
+              <option value="Hikaru">Hikaru</option>
+              <option value="Eric Rosen">Eric Rosen</option>
+            </select>
+          </div>
           <button type="submit" className={styles.button}>
             Annotate PGN
           </button>

@@ -58,13 +58,16 @@ const FileInputForm: React.FC<FileInputFormProps> = ({
         ></textarea>
       </div>
 
-      <div className={styles.formGroup}>
+      <div className={`${styles.formGroup} ${styles.inputWrapper}`}>
         <input
           id="fileUpload"
           type="file"
           onChange={handleFileChange}
           className={styles.fileUpload}
         />
+        <label htmlFor="fileUpload" className={styles.fileInputLabel}>
+          Choose File
+        </label>
       </div>
     </>
   );

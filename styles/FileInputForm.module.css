@@ -1,4 +1,29 @@
 /* styles/FileInputForm.module.css */
+.inputWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.fileUpload {
+  display: none;
+}
+
+.fileInputLabel {
+  background-color: #2c2c2c;
+  color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem; /* Reduced font size */
+  transition: background-color 0.2s ease;
+}
+
+.fileInputLabel:hover {
+  background-color: #3a3a3a; /* Added hover effect */
+}
 
 .formGroup {
   display: flex;
@@ -13,7 +38,6 @@
 .textArea {
   resize: none;
   width: 100%;
-  /* Updated width */
   height: 150px;
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -21,12 +45,4 @@
   background-color: #2c2c2c;
   color: #ffffff;
   outline: none;
-}
-
-.fileUpload {
-  cursor: pointer;
-}
-
-.button:hover {
-  background-color: #0055d4;
 }
