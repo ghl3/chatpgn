@@ -12,6 +12,8 @@ const parseAndAnnotatePgn = async (pgnText: string, persona: Persona) => {
   try {
     const pgn: ParsedPGN = parse(pgnText)[0];
     const annotatedPgn = await annotatePgn(pgn, persona);
+    console.log("Annotated PGN");
+    console.log(annotatedPgn);
   } catch (error) {
     console.error("Error parsing PGN:", error);
   }

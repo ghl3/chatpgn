@@ -7,33 +7,14 @@ import { fischer_spassky } from "@/utils/pgns";
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPEN_AI_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
-//const API_KEY = process.env.OPENAI_KEY;
-//const CHATGPT_API_URL =
-//  "https://api.openai.com/v1/engines/davinci-codex/completions";
 
 const generatePrompt = (pgn: ParsedPGN, persona: string): string => {
   // Add your custom business logic here to generate the prompt
   return "My Prompt";
 };
-
-/*
-openai.ChatCompletion.create(
-  (model = "gpt-3.5-turbo"),
-  (messages = [
-    { role: "system", content: "You are a helpful assistant." },
-    { role: "user", content: "Who won the world series in 2020?" },
-    {
-      role: "assistant",
-      content: "The Los Angeles Dodgers won the World Series in 2020.",
-    },
-    { role: "user", content: "Where was it played?" },
-  ])
-);
-*/
 
 const convertToPgn = (chatResponse: string): ParsedPGN => {
   return fischer_spassky;
@@ -64,17 +45,14 @@ export default async function handler(
         const response = completion.data.choices[0].text;
         console.log("Response:");
         console.log(response);
-        res.status(200).json(convertToPgn(completion.data.choices[0].text));
+        res.status(200).json(convertToPgn(response));
       }
-
-      res.status(200).json(convertToPgn(prompt));
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error.name, error.message, error.cause); //. error);
+        console.log(error.name, error.message, error.cause);
         res.status(500).json({ error: error });
       } else {
         console.log("ERROR B");
-
         res.status(500).json({ error: "An unknown error occurred" });
       }
     }
