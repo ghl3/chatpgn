@@ -5,18 +5,14 @@ import PersonaSelector from "../components/PersonaSelector";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParsedPGN, parse } from "pgn-parser";
-import { chatGPT } from "../utils/chatgpt";
-
-const createPrompt = (pgn: ParsedPGN): string => {
-  return "foobar";
-};
+import { annotatePgn } from "../utils/annotatePgn";
 
 const parseAndAnnotatePgn = async (pgnText: string) => {
   try {
     console.log("Parsing PGN: \n" + pgnText);
-    const parsedPgn: ParsedPGN = parse(pgnText)[0];
-    console.log("Parsed PGN:", parsedPgn);
-    const annotatedPgn = await chatGPT(createPrompt(parsedPgn));
+    const pgn: ParsedPGN = parse(pgnText)[0];
+    console.log("Parsed PGN:", pgn);
+    const annotatedPgn = await annotatePgn(pgn);
     console.log("Annotated PGN:", annotatedPgn);
   } catch (error) {
     console.error("Error parsing PGN:", error);
