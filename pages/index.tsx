@@ -7,12 +7,12 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParsedPGN, parse } from "pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
 
-const parseAndAnnotatePgn = async (pgnText: string) => {
+const parseAndAnnotatePgn = async (pgnText: string, persona: string) => {
   try {
     console.log("Parsing PGN: \n" + pgnText);
     const pgn: ParsedPGN = parse(pgnText)[0];
     console.log("Parsed PGN:", pgn);
-    const annotatedPgn = await annotatePgn(pgn);
+    const annotatedPgn = await annotatePgn(pgn, persona);
     console.log("Annotated PGN:", annotatedPgn);
   } catch (error) {
     console.error("Error parsing PGN:", error);
@@ -25,7 +25,7 @@ export default function Home() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    parseAndAnnotatePgn(pgnText);
+    parseAndAnnotatePgn(pgnText, persona);
   };
 
   const handlePersonaChange = (event: ChangeEvent<HTMLSelectElement>) => {

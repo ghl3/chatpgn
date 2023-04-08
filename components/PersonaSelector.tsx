@@ -1,8 +1,9 @@
 import React, { ChangeEvent } from "react";
 import styles from "../styles/PersonaSelector.module.css";
+import { Persona } from "../utils/persona";
 
 interface PersonaSelectorProps {
-  persona: string;
+  persona: Persona;
   onPersonaChange: (event: ChangeEvent<HTMLSelectElement>) => void;
 }
 
@@ -19,11 +20,11 @@ const PersonaSelector: React.FC<PersonaSelectorProps> = ({
         onChange={onPersonaChange}
         className={styles.personaDropdown}
       >
-        <option value="Standard">Standard</option>
-        <option value="Gotham Chess">Gotham Chess</option>
-        <option value="Daniel Naroditsky">Daniel Naroditsky</option>
-        <option value="Hikaru">Hikaru</option>
-        <option value="Eric Rosen">Eric Rosen</option>
+        {Object.values(Persona).map((p) => (
+          <option key={p} value={p}>
+            {p}
+          </option>
+        ))}
       </select>
     </div>
   );

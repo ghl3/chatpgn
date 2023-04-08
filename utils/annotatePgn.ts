@@ -3,9 +3,15 @@
 import axios from "axios";
 import { ParsedPGN } from "pgn-parser";
 
-export const annotatePgn = async (input: ParsedPGN): Promise<ParsedPGN> => {
+export const annotatePgn = async (
+  input: ParsedPGN,
+  persona: string
+): Promise<ParsedPGN> => {
   try {
-    const response = await axios.post("/api/annotatePgn", { input });
+    const response = await axios.post("/api/annotatePgn", {
+      pgn: input,
+      persona: persona,
+    });
     return response.data;
   } catch (error) {
     console.log(error);

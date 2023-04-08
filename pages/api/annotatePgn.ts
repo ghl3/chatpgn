@@ -43,7 +43,7 @@ const API_KEY = "your-api-key-here";
 const CHATGPT_API_URL =
   "https://api.openai.com/v1/engines/davinci-codex/completions";
 
-const generatePrompt = (pgn: ParsedPGN): string => {
+const generatePrompt = (pgn: ParsedPGN, persona: string): string => {
   // Add your custom business logic here to generate the prompt
   return "My Prompt";
 };
@@ -58,11 +58,9 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const parsedPgn: ParsedPGN = req.body.input;
-
-      const prompt = generatePrompt(parsedPgn);
-
-      console.log("FOOBAR");
+      const pgn: ParsedPGN = req.body.pgn;
+      const persona: string = req.body.persona;
+      const prompt = generatePrompt(pgn, persona);
 
       /*
       const response = await axios.post(
