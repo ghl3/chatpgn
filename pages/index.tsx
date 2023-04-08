@@ -6,8 +6,9 @@ import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParsedPGN, parse } from "pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
+import { Persona } from "../utils/persona";
 
-const parseAndAnnotatePgn = async (pgnText: string, persona: string) => {
+const parseAndAnnotatePgn = async (pgnText: string, persona: Persona) => {
   try {
     console.log("Parsing PGN: \n" + pgnText);
     const pgn: ParsedPGN = parse(pgnText)[0];
@@ -21,7 +22,7 @@ const parseAndAnnotatePgn = async (pgnText: string, persona: string) => {
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
-  const [persona, setPersona] = useState("Standard");
+  const [persona, setPersona] = useState<Persona>(Persona.Standard);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,7 +30,7 @@ export default function Home() {
   };
 
   const handlePersonaChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setPersona(event.target.value);
+    setPersona(event.target.value as Persona);
   };
 
   return (

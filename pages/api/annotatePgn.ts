@@ -2,42 +2,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { ParsedPGN } from "pgn-parser";
-
-const examplePgn: ParsedPGN = {
-  comments_above_header: null,
-  headers: [
-    { name: "Event", value: "F/S Return Match" },
-    { name: "Site", value: "Belgrade, Serbia JUG" },
-    { name: "Date", value: "1992.11.04" },
-    { name: "Round", value: "29" },
-    { name: "White", value: "Fischer, Robert J." },
-    { name: "Black", value: "Spassky, Boris V." },
-    { name: "Result", value: "1/2-1/2" },
-  ],
-  comments: null,
-  moves: [
-    { move: "e4", comments: [], move_number: 1 },
-    { move: "e5", comments: [] },
-    {
-      move: "Nf3",
-      comments: ["This is the Knight's Opening."],
-      move_number: 2,
-    },
-    { move: "Nc6", comments: [] },
-    { move: "Bb5", comments: ["The Ruy Lopez Opening."], move_number: 3 },
-    { move: "a6", comments: [] },
-    { move: "Ba4", comments: [], move_number: 4 },
-    { move: "Nf6", comments: [] },
-    { move: "O-O", comments: [], move_number: 5 },
-    { move: "Be7", comments: [] },
-    { move: "Re1", comments: [], move_number: 6 },
-    { move: "b5", comments: [] },
-    { move: "Bb3", comments: ["The bishop retreats."], move_number: 7 },
-    { move: "d6", comments: [] },
-    { move: "c3", comments: [], move_number: 8 },
-  ],
-  result: "1/2-1/2",
-};
+import { Persona } from "../../utils/persona";
+import { fischer_spassky } from "@/utils/pgns";
 
 const API_KEY = "your-api-key-here";
 const CHATGPT_API_URL =
@@ -49,7 +15,7 @@ const generatePrompt = (pgn: ParsedPGN, persona: string): string => {
 };
 
 const convertToPgn = (chatResponse: string): ParsedPGN => {
-  return examplePgn;
+  return fischer_spassky;
 };
 
 export default async function handler(
@@ -59,7 +25,11 @@ export default async function handler(
   if (req.method === "POST") {
     try {
       const pgn: ParsedPGN = req.body.pgn;
-      const persona: string = req.body.persona;
+      const persona: Persona = req.body.persona;
+
+      console.log("Input PGN:", pgn); // Log the input PGN
+      console.log("Persona:", persona); // Log the persona
+
       const prompt = generatePrompt(pgn, persona);
 
       /*
