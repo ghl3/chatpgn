@@ -10,11 +10,8 @@ import { Persona } from "../utils/persona";
 
 const parseAndAnnotatePgn = async (pgnText: string, persona: Persona) => {
   try {
-    console.log("Parsing PGN: \n" + pgnText);
     const pgn: ParsedPGN = parse(pgnText)[0];
-    console.log("Parsed PGN:", pgn);
     const annotatedPgn = await annotatePgn(pgn, persona);
-    console.log("Annotated PGN:", annotatedPgn);
   } catch (error) {
     console.error("Error parsing PGN:", error);
   }

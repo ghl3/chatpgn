@@ -1,6 +1,6 @@
 // utils/annotatePgn.ts
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { ParsedPGN } from "pgn-parser";
 
 export const annotatePgn = async (
@@ -14,7 +14,9 @@ export const annotatePgn = async (
     });
     return response.data;
   } catch (error) {
-    console.log(error);
+    if (error instanceof AxiosError) {
+      console.log(error.response?.data.error);
+    }
     throw new Error("Failed to annotate pgn");
   }
 };
