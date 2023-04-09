@@ -1,12 +1,13 @@
 // utils/annotatePgn.ts
 
 import axios, { AxiosError } from "axios";
-import { ParsedPGN } from "pgn-parser";
+import { ParseTree } from "@mliebelt/pgn-parser";
+import { Persona } from "./persona";
 
 export const annotatePgn = async (
-  input: ParsedPGN,
-  persona: string
-): Promise<ParsedPGN> => {
+  input: ParseTree,
+  persona: Persona
+): Promise<ParseTree> => {
   try {
     const response = await axios.post("/api/annotatePgn", {
       pgn: input,

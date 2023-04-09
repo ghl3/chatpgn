@@ -1,10 +1,10 @@
 import React from "react";
-import { ParsedPGN } from "pgn-parser";
 import { pgnToString } from "../utils/pgnToString";
 import styles from "../styles/AnnotatedPgnDisplay.module.css";
+import { ParseTree } from "@mliebelt/pgn-parser";
 
 interface AnnotatedPgnDisplayProps {
-  pgn: ParsedPGN | null;
+  pgn: ParseTree | null;
 }
 
 const AnnotatedPgnDisplay: React.FC<AnnotatedPgnDisplayProps> = ({ pgn }) => {

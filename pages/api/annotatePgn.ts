@@ -1,18 +1,18 @@
 // pages/api/annotatedPgn.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { Persona } from "../../utils/persona";
-import { ParsedPGN, parse } from "pgn-parser";
 import { Configuration, OpenAIApi } from "openai";
 import { systemPrompt } from "@/utils/prompts";
 import { pgnToString } from "@/utils/pgnToString";
+import { parseGame, ParseTree } from "@mliebelt/pgn-parser";
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-const convertToPgn = (chatResponse: string): ParsedPGN => {
-  return parse(chatResponse)[0];
+const convertToPgn = (chatResponse: string): ParseTree => {
+  return parseGame(chatResponse);
 };
 
 export default async function handler(
@@ -21,7 +21,7 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const pgn: ParsedPGN = req.body.pgn;
+      const pgn: ParseTree = req.body.pgn;
       const persona: Persona = req.body.persona;
 
       console.log("Annotating PGN with Persona:", persona);

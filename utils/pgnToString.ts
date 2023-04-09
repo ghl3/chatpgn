@@ -1,34 +1,61 @@
-import { ParsedPGN, Move, Header } from "pgn-parser";
+import { ParseTree } from "@mliebelt/pgn-parser";
+import { Tags, PgnMove } from "@mliebelt/pgn-types";
 
-const moveToString = (move: Move): string => {
+const moveToString = (move: PgnMove, followsComment: boolean): string => {
   let result = "";
-  if (move.move_number) {
-    result += move.move_number + ".";
+
+  if (move.moveNumber && move.turn === "b" && followsComment) {
+    result += `${move.moveNumber.toString()}...`;
+  } else if (move.moveNumber && move.turn === "w") {
+    result += `${move.moveNumber.toString()}. `;
   }
-  result += move.move;
-  if (move.comments && move.comments.length > 0) {
-    result += " {" + move.comments.join(", ") + "}";
+
+  result += `${move.notation.notation.toString()}`;
+
+  if (
+    move.commentDiag &&
+    move.commentDiag.comment &&
+    move.commentDiag.comment != ""
+  ) {
+    result += ` {${move.commentDiag.comment}}`;
   }
   return result;
 };
 
-const displayHeaders = (headers: Header[] | null) => {
-  if (!headers) return "";
+const displayHeaders = (tags: Tags) => {
   let headerString = "";
-  headers.forEach((header) => {
-    headerString += `[${header.name} "${header.value}"]\n`;
-  });
+  for (const [k, v] of Object.entries(tags)) {
+    headerString += `[${k} \"${v}\"]\n`;
+  }
   return headerString;
 };
 
-export const pgnToString = (parsedPgn: ParsedPGN): string => {
-  let pgnText = displayHeaders(parsedPgn.headers);
+export const pgnToString = (pgn: ParseTree): string => {
+  let pgnText = "";
 
-  parsedPgn.moves.forEach((move) => {
-    pgnText += moveToString(move) + " ";
-  });
+  if (pgn.tags) {
+    pgnText += displayHeaders(pgn.tags);
+  }
 
-  pgnText += parsedPgn.result;
+  pgnText += "\n";
+
+  let commentOnPrevious = false;
+  for (const move of pgn.moves) {
+    // After a white comment, we put black on a newline
+    if (move.turn === "b" && commentOnPrevious) {
+      pgnText += "\n";
+      // Otherwise, we add a space before black
+    } else if (move.turn === "b") {
+      pgnText += " ";
+    }
+    pgnText += moveToString(move, commentOnPrevious);
+
+    // And we always add a newline after black.
+    if (move.turn === "b") {
+      pgnText += "\n";
+    }
+    commentOnPrevious = move.commentAfter != null;
+  }
 
   return pgnText;
 };

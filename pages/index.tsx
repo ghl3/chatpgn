@@ -5,19 +5,19 @@ import PersonaSelector from "../components/PersonaSelector";
 import AnnotatedPgnDisplay from "../components/AnnotatedPgnDisplay";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { ParsedPGN, parse } from "pgn-parser";
+import { ParseTree, parseGame } from "@mliebelt/pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
 import { Persona } from "../utils/persona";
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
   const [persona, setPersona] = useState<Persona>(Persona.Standard);
-  const [annotatedPgn, setAnnotatedPgn] = useState<ParsedPGN | null>(null);
+  const [annotatedPgn, setAnnotatedPgn] = useState<ParseTree | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const pgn: ParsedPGN = parse(pgnText)[0];
+      const pgn: ParseTree = parseGame(pgnText);
       const response = await annotatePgn(pgn, persona);
       setAnnotatedPgn(response);
     } catch (error) {
