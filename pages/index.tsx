@@ -8,20 +8,36 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParseTree, parseGame } from "@mliebelt/pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
 import { Persona } from "../utils/persona";
+import Image from "next/image";
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
   const [persona, setPersona] = useState<Persona>(Persona.Standard);
   const [annotatedPgn, setAnnotatedPgn] = useState<ParseTree | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
+    setError("");
+    setAnnotatedPgn(null);
+
     try {
       const pgn: ParseTree = parseGame(pgnText);
-      const response = await annotatePgn(pgn, persona);
+
+      const response = await Promise.race([
+        annotatePgn(pgn, persona),
+        new Promise<ParseTree>(
+          (_, reject) => setTimeout(() => reject(new Error("Timeout")), 20000) // 10 seconds timeout
+        ),
+      ]);
       setAnnotatedPgn(response);
     } catch (error) {
       console.error("Error annotating PGN:", error);
+      setError("An error occurred while annotating PGN or it timed out.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,6 +68,17 @@ export default function Home() {
             Annotate PGN
           </button>
         </form>
+        {loading && (
+          <div className={styles.loading}>
+            <Image
+              src="/images/loading.gif"
+              alt="Loading..."
+              width="64"
+              height="64"
+            />
+          </div>
+        )}
+        {error && <div className={styles.error}>{error}</div>}
         <AnnotatedPgnDisplay pgn={annotatedPgn} />
       </main>
     </>

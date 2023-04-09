@@ -68,3 +68,7 @@
 .wordWrap {
   white-space: pre-wrap;
 }
+
+.loading img {
+  margin-top: 20px;
+}
