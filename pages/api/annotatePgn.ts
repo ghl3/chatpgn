@@ -2,19 +2,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ParsedPGN } from "pgn-parser";
 import { Persona } from "../../utils/persona";
-import { fischer_spassky } from "@/utils/pgns";
+import { fischer_spassky } from "@/data/parsed_pgns";
 
 import { Configuration, OpenAIApi } from "openai";
+import { generatePrompt } from "@/utils/prompts";
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
-const generatePrompt = (pgn: ParsedPGN, persona: string): string => {
-  // Add your custom business logic here to generate the prompt
-  return "My Prompt";
-};
 
 const convertToPgn = (chatResponse: string): ParsedPGN => {
   return fischer_spassky;
