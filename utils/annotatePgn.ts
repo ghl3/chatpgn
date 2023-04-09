@@ -12,7 +12,7 @@ export const annotatePgn = async (
       pgn: input,
       persona: persona,
     });
-    return response.data;
+    return response.data.pgn;
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log(error.response?.data.error);
