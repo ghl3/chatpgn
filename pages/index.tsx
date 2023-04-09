@@ -2,12 +2,14 @@
 import Head from "next/head";
 import FileInputForm from "../components/FileInputForm";
 import PersonaSelector from "../components/PersonaSelector";
+import AnnotatedPgnDisplay from "../components/AnnotatedPgnDisplay";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParsedPGN, parse } from "pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
 import { Persona } from "../utils/persona";
 
+/*
 const parseAndAnnotatePgn = async (pgnText: string, persona: Persona) => {
   try {
     const pgn: ParsedPGN = parse(pgnText)[0];
@@ -18,14 +20,21 @@ const parseAndAnnotatePgn = async (pgnText: string, persona: Persona) => {
     console.error("Error parsing PGN:", error);
   }
 };
-
+*/
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
   const [persona, setPersona] = useState<Persona>(Persona.Standard);
+  const [annotatedPgn, setAnnotatedPgn] = useState<ParsedPGN | null>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    parseAndAnnotatePgn(pgnText, persona);
+    try {
+      const pgn: ParsedPGN = parse(pgnText)[0];
+      const response = await annotatePgn(pgn, persona);
+      setAnnotatedPgn(response);
+    } catch (error) {
+      console.error("Error annotating PGN:", error);
+    }
   };
 
   const handlePersonaChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -55,6 +64,7 @@ export default function Home() {
             Annotate PGN
           </button>
         </form>
+        <AnnotatedPgnDisplay pgn={annotatedPgn} />
       </main>
     </>
   );
