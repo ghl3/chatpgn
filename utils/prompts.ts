@@ -1,6 +1,4 @@
-import { ParsedPGN } from "pgn-parser";
 import { Persona } from "./persona";
-import { pgnToString } from "./pgnToString";
 
 const BASE_PROMPT: string = `You are a Chess PGN annotator.
 I want you to annotate the given Chess PGN with in-line comments.
@@ -45,11 +43,4 @@ Twitch streams, such as "Oh ny my queen!" and "Daaaaaaah" and "No Mercy".`;
 export const systemPrompt = (persona: Persona): string => {
   const personaPrompt = getPersonaPrompt(persona);
   return `${BASE_PROMPT}\n${personaPrompt}\n${FOOTER_PROMPT}`;
-};
-
-export const generatePrompt = (pgn: ParsedPGN, persona: Persona): string => {
-  const basePrompt = BASE_PROMPT;
-  const personaPrompt = getPersonaPrompt(persona);
-  const pgnString = pgnToString(pgn);
-  return `${basePrompt}\n${personaPrompt}\n${pgnString}`;
 };
