@@ -64,3 +64,7 @@
 .personaDropdown {
   margin-left: 10px;
 }
+
+.wordWrap {
+  white-space: pre-wrap;
+}
