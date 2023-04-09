@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Persona } from "../../utils/persona";
 import { ParsedPGN, parse } from "pgn-parser";
 import { Configuration, OpenAIApi } from "openai";
-import { generatePrompt, systemPrompt } from "@/utils/prompts";
+import { systemPrompt } from "@/utils/prompts";
 import { pgnToString } from "@/utils/pgnToString";
 
 const configuration = new Configuration({
