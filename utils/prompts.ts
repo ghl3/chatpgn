@@ -6,7 +6,8 @@ const BASE_PROMPT: string = `
 I want you to annotate the following Chess PGN with in-line comments.
 - You should try to add comments to any interesting moves.
 - You may make comments on both black and white moves.
-- The comments should be aimed at a high level, so they should be advanced and instructive.`;
+- The comments should be aimed at a high level, so they should be advanced and instructive.
+- You should only return a valid PGN.  Don't include any other response, text, or acknowledgement.`;
 
 const getPersonaPrompt = (persona: Persona): string => {
   switch (persona) {

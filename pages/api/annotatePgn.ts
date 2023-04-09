@@ -1,9 +1,7 @@
 // pages/api/annotatedPgn.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { ParsedPGN } from "pgn-parser";
 import { Persona } from "../../utils/persona";
-import { fischer_spassky } from "@/data/parsed_pgns";
-
+import { ParsedPGN, parse } from "pgn-parser";
 import { Configuration, OpenAIApi } from "openai";
 import { generatePrompt } from "@/utils/prompts";
 
@@ -13,7 +11,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const convertToPgn = (chatResponse: string): ParsedPGN => {
-  return fischer_spassky;
+  return parse(chatResponse)[0];
 };
 
 export default async function handler(
@@ -33,6 +31,9 @@ export default async function handler(
         model: "text-davinci-003",
         prompt: prompt,
       });
+
+      console.log("Got Response:");
+      console.log(completion);
 
       if (completion.data.choices[0].text === undefined) {
         console.log("NO WAY!");
