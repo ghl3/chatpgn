@@ -26,6 +26,7 @@ export default async function handler(
 
   const pgn: ParseTree = req.body.pgn;
   const persona: Persona = req.body.persona;
+  console.log("Received request for PGN annotation with Persona:", persona);
 
   try {
     const completion = await openai.createChatCompletion({
