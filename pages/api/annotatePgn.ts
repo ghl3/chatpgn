@@ -19,48 +19,52 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "POST") {
-    try {
-      const pgn: ParseTree = req.body.pgn;
-      const persona: Persona = req.body.persona;
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method not allowed", method: req.method });
+    return;
+  }
 
-      console.log("Annotating PGN with Persona:", persona);
+  const pgn: ParseTree = req.body.pgn;
+  const persona: Persona = req.body.persona;
 
-      const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        n: 1,
-        max_tokens: 2048,
-        temperature: 0.5,
-        messages: [
-          { role: "system", content: systemPrompt(persona) },
-          { role: "user", content: pgnToString(pgn) },
-        ],
+  try {
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      n: 1,
+      max_tokens: 2048,
+      temperature: 0.5,
+      messages: [
+        { role: "system", content: systemPrompt(persona) },
+        { role: "user", content: pgnToString(pgn) },
+      ],
+    });
+
+    if (completion.data.choices[0].message?.content === undefined) {
+      console.error("Completion response is missing content");
+      res.status(500).json({
+        error: "Completion response is missing content",
+        details: completion.data.choices[0],
       });
-
-      console.log("Got Response:");
-      console.log(completion);
-
-      if (completion.data.choices[0].message?.content === undefined) {
-        console.log("NO WAY!");
-        res.status(500).json({ error: "NO WAY" });
-      } else {
-        const response = completion.data.choices[0].message?.content;
-        console.log("Response:");
-        console.log(response);
-        const annotatedPgn = convertToPgn(response);
-        res.status(200).json({ pgn: annotatedPgn });
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.name, error.message, error.cause);
-        res.status(500).json({ error: error });
-      } else {
-        console.log("ERROR B");
-        res.status(500).json({ error: "An unknown error occurred" });
-      }
+      return;
     }
-  } else {
-    console.log("ERROR C");
-    res.status(405).json({ error: "Method not allowed" });
+
+    const response = completion.data.choices[0].message.content;
+
+    try {
+      const annotatedPgn = convertToPgn(response);
+      res.status(200).json({ pgn: annotatedPgn });
+    } catch (pgnError) {
+      console.error("PGN conversion error:", pgnError);
+      res.status(500).json({
+        error: "PGN conversion error",
+        details: { response, pgnError },
+      });
+    }
+  } catch (error) {
+    console.error("An unknown error occurred:", error);
+    res.status(500).json({
+      error: "An unknown error occurred",
+      details: { errorMessage: (error as Error).message },
+    });
   }
 }
