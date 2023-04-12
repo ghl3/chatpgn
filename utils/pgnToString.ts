@@ -1,5 +1,7 @@
+// utils/pgnToString.ts
+
 import { ParseTree } from "@mliebelt/pgn-parser";
-import { Tags, PgnMove } from "@mliebelt/pgn-types";
+import { Tags, PgnMove, Message } from "@mliebelt/pgn-types";
 
 const moveToString = (move: PgnMove, followsComment: boolean): string => {
   let result = "";
@@ -22,11 +24,23 @@ const moveToString = (move: PgnMove, followsComment: boolean): string => {
   return result;
 };
 
+const parseObjectToString = (o: object): string => {
+  if ("value" in o) {
+    return (o as any)["value"].toString();
+  } else {
+    return o.toString();
+  }
+};
+
 const displayHeaders = (tags: Tags) => {
   let headerString = "";
   for (const [k, v] of Object.entries(tags)) {
-    headerString += `[${k} \"${v}\"]\n`;
+    if (k !== "messages") {
+      const value = typeof v === "object" ? parseObjectToString(v) : v;
+      headerString += `[${k} "${value}"]\n`;
+    }
   }
+
   return headerString;
 };
 

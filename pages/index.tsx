@@ -29,7 +29,7 @@ export default function Home() {
       const response = await Promise.race([
         annotatePgn(pgn, persona),
         new Promise<ParseTree>(
-          (_, reject) => setTimeout(() => reject(new Error("Timeout")), 20000) // 10 seconds timeout
+          (_, reject) => setTimeout(() => reject(new Error("Timeout")), 30000) // 30 seconds timeout
         ),
       ]);
       setAnnotatedPgn(response);
@@ -64,9 +64,11 @@ export default function Home() {
             persona={persona}
             onPersonaChange={handlePersonaChange}
           />
-          <button type="submit" className={styles.button}>
-            Annotate PGN
-          </button>
+          {!loading && (
+            <button type="submit" className={styles.button}>
+              Annotate PGN
+            </button>
+          )}
         </form>
         {loading && (
           <div className={styles.loading}>
