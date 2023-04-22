@@ -7,13 +7,9 @@ import axios from "axios";
 import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
-import { Fen } from "@/chess/Fen";
 import styles from "../styles/Review.module.css";
 import { MoveDescription } from "./api/reviewGame";
 import { useChessboard } from "@/hooks/UseChessboard";
-
-//const defaultFen: Fen =
-//  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 const Review = () => {
   const chessboardData = useChessboard();
@@ -21,9 +17,6 @@ const Review = () => {
   const [gameId, setGameId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-  //const [game, setGame] = useState<Game | null>(null);
-  //const [moveIndex, setMoveIndex] = useState<number>(0);
-  //const [position, setPosition] = useState<Position | null>(null);
   const [moveDescriptions, setMoveDescriptions] = useState<
     MoveDescription[] | null
   >(null);
@@ -33,49 +26,6 @@ const Review = () => {
   const [currentMoveDescription, setCurrentMoveDescription] = useState<
     string | null
   >(null);
-
-  // Definet the app level state
-  //const [boardSize, setBoardSize] = useState<number>(600);
-
-  /*
-  // Ensure the board is always sized correctly
-  useEffect(() => {
-    // Initialize the board
-    const getViewportSizes = () => {
-      const vw = Math.max(
-        document.documentElement.clientWidth || 0,
-        window.innerWidth || 0
-      );
-      const vh = Math.max(
-        document.documentElement.clientHeight || 0,
-        window.innerHeight || 0
-      );
-      return [vw, vh];
-    };
-
-    const resizeBoard = () => {
-      const [vw, vh] = getViewportSizes();
-      const UiHeight = 250;
-      let newBoardSize;
-
-      if (vw > vh) {
-        newBoardSize = vh - UiHeight;
-      } else {
-        if (vh - vw <= UiHeight) {
-          newBoardSize = vh - UiHeight;
-        } else {
-          newBoardSize = vw - 52;
-        }
-      }
-
-      setBoardSize(newBoardSize);
-    };
-
-    resizeBoard();
-
-    window.addEventListener("resize", resizeBoard);
-  }, []);
-  */
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,7 +37,7 @@ const Review = () => {
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
       chessboardData.setGame(game);
-      chessboardData.setPositionFromIndex(0); //(game.positions[0]);
+      chessboardData.setPositionFromIndex(0);
       console.log(game);
 
       setLoadingMessage("Annotating game...");
