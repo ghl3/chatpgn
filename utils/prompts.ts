@@ -32,7 +32,7 @@ Youtube videos, such as his recaps and Guess the Elo.`;
     case Persona.Eric_Rosen:
       return `You should make your comments in the style of International Master Eric Rosen.
 Please use his tone and the words and phrases he commonly uses in his Youtube videos and
-Twitch streams, such as "Oh ny my queen!" and "Daaaaaaah" and "No Mercy".`;
+Twitch streams, such as "Oh no my queen!", "Daaaaaaah", and "No Mercy".`;
 
     default:
       const exhaustiveCheck: never = persona;
