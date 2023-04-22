@@ -10,7 +10,7 @@ export const useChessboard = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [moveIndex, setMoveIndex] = useState<number>(0);
   const [position, setPosition] = useState<Position | null>(null);
-  const [boardSize, setBoardSize] = useState<number>(600);
+  const [boardSize, setBoardSize] = useState<number>(400);
 
   const loadGame = (game: Game) => {
     setGame(game);
@@ -61,6 +61,13 @@ export const useChessboard = () => {
 
     const resizeBoard = () => {
       const [vw, vh] = getViewportSizes();
+
+      // The board should be no more than 1/3 the width
+      // We round to the nearest 10px
+      const newBoardSize = Math.floor(Math.min(vw / 3, vh - 250) / 10) * 10;
+      setBoardSize(newBoardSize);
+
+      /*
       const UiHeight = 250;
       let newBoardSize;
 
@@ -75,6 +82,7 @@ export const useChessboard = () => {
       }
 
       setBoardSize(newBoardSize);
+      */
     };
 
     resizeBoard();

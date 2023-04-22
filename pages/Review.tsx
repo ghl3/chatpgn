@@ -120,34 +120,37 @@ const Review = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.GameReview}>
-        <div className={styles.formContainer}>
-          <h1>Enter Chess.com Game ID</h1>
-          <form onSubmit={handleSubmit} className={styles.gameIdForm}>
-            <label htmlFor="game-id">Game ID:</label>
-            <input
-              type="text"
-              id="game-id"
-              value={gameId}
-              onChange={(e) => setGameId(e.target.value)}
-            />
-            <button type="submit" disabled={isLoading}>
-              Review
-            </button>
-          </form>
-          <p
-            className={classNames(styles.loadingMessage, {
-              [styles.hidden]: !loadingMessage,
-            })}
-          >
-            {loadingMessage || " "}
-          </p>
-        </div>
-
-        <div className="ui grid container">
-          <div className="ten wide column">
+        <div className="ui container grid">
+          <div className="four wide centered column"></div>
+          <div className="eight wide centered column">
             <div className="ui center aligned one column grid">
               <div className="row">
-                <div className="Chessboard">
+                <div className={styles.formContainer}>
+                  <h1>Enter Chess.com Game ID</h1>
+                  <form onSubmit={handleSubmit} className={styles.gameIdForm}>
+                    <label htmlFor="game-id">Game ID:</label>
+                    <input
+                      type="text"
+                      id="game-id"
+                      value={gameId}
+                      onChange={(e) => setGameId(e.target.value)}
+                    />
+                    <button type="submit" disabled={isLoading}>
+                      Review
+                    </button>
+                  </form>
+                  <p
+                    className={classNames(styles.loadingMessage, {
+                      [styles.hidden]: !loadingMessage,
+                    })}
+                  >
+                    {loadingMessage || " "}
+                  </p>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className={styles.Chessboard}>
                   <Chessboard
                     position={chessboardData.getPositionFen()}
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
@@ -190,20 +193,20 @@ const Review = () => {
                   </button>
                 </div>
               </div>
-            </div>
-
-            <div className="ten wide column">
-              <div className={styles.descriptionContainer}>
-                <p
-                  className={classNames(styles.descriptionText, {
-                    [styles.hidden]: !currentMoveDescription,
-                  })}
-                >
-                  {currentMoveDescription || " "}
-                </p>
+              <div className="row">
+                <div className={styles.descriptionContainer}>
+                  <p
+                    className={classNames(styles.descriptionText, {
+                      [styles.hidden]: !currentMoveDescription,
+                    })}
+                  >
+                    {currentMoveDescription || " "}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+          <div className="four wide centered column"></div>
         </div>
       </main>
     </>
