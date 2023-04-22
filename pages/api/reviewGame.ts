@@ -7,237 +7,107 @@ import {
   systemPrompt,
 } from "@/utils/gameReviewPrompts";
 
-const dummyResult = {
-  overallDescription: "This game was a draw.",
-  moveDescriptions: [
-    {
-      index: 1,
-      move: "d4",
-      description: "ghlewis opens with d4, a Queen's Pawn Opening.",
-    },
-    {
-      index: 2,
-      move: "d5",
-      description: "Black responds symmetrically with d5.",
-    },
-    {
-      index: 3,
-      move: "Nc3",
-      description: "ghlewis develops his knight to attack the pawn on d5.",
-    },
-    {
-      index: 4,
-      move: "Bf4",
-      description: "Black develops the bishop to defend the pawn on d5.",
-    },
-    {
-      index: 5,
-      move: "Nf3",
-      description: "ghlewis develops his knight to attack the bishop on d6.",
-    },
-    {
-      index: 6,
-      move: "e3",
-      description: "Black retreats the bishop to e6.",
-    },
-    {
-      index: 7,
-      move: "Ne5",
-      description: "ghlewis moves the knight to attack the weak f7 square.",
-    },
-    {
-      index: 8,
-      move: "Bd3",
-      description: "Black develops the bishop to d6, defending the f8 square.",
-    },
-    {
-      index: 9,
-      move: "dxc5",
-      description:
-        "ghlewis captures the pawn on d5 with his pawn, opening up the center.",
-    },
-    {
-      index: 10,
-      move: "fxe5",
-      description: "Black captures back with the knight.",
-    },
-    {
-      index: 11,
-      move: "Qh5",
-      description: "ghlewis moves his queen to attack the pawn on h7.",
-    },
-    {
-      index: 12,
-      move: "Qh3",
-      description: "Black moves the pawn to h6 to defend the pawn on h7.",
-    },
-    {
-      index: 13,
-      move: "O-O-O",
-      description:
-        "ghlewis castles queenside, bringing his king to safety and connecting his rooks.",
-    },
-    {
-      index: 14,
-      move: "Rd3",
-      description:
-        "ghlewis moves his rook to the d-file, preparing to double his rooks and attack the open d-file.",
-    },
-    {
-      index: 15,
-      move: "Rf3",
-      description: "Black moves the queen to g7 to defend the pawn on h6.",
-    },
-    {
-      index: 16,
-      move: "g4",
-      description:
-        "ghlewis pushes his pawn to g4, creating a pawn storm on the kingside.",
-    },
-    {
-      index: 17,
-      move: "Nxd5",
-      description:
-        "ghlewis sacrifices his knight to open up lines of attack against the black king.",
-    },
-    {
-      index: 18,
-      move: "Nc7+",
-      description:
-        "ghlewis checks the black king with his knight, forcing the king to move.",
-    },
-    {
-      index: 19,
-      move: "Nxa8",
-      description: "Black captures the knight with his bishop.",
-    },
-    {
-      index: 20,
-      move: "Nc7+",
-      description: "ghlewis checks the black king again with his knight.",
-    },
-    {
-      index: 21,
-      move: "Qxf3",
-      description: "Black moves the queen to f7 to defend the pawn on h7.",
-    },
-    {
-      index: 22,
-      move: "Qd5+",
-      description:
-        "ghlewis moves his queen to d5, attacking the f7 pawn and threatening checkmate on h7.",
-    },
-    {
-      index: 23,
-      move: "Qxf7+",
-      description: "Black captures the queen with the rook.",
-    },
-    {
-      index: 24,
-      move: "Nd5",
-      description: "ghlewis moves his knight to attack the black rook on f8.",
-    },
-    {
-      index: 25,
-      move: "Re1",
-      description: "Black moves the rook to h5, defending the pawn on h6.",
-    },
-    {
-      index: 26,
-      move: "Re5",
-      description:
-        "ghlewis moves his rook to e5, attacking the weak pawn on f5.",
-    },
-    {
-      index: 27,
-      move: "Re8+",
-      description: "ghlewis checks the black king with his rook.",
-    },
-    {
-      index: 28,
-      move: "Re7+",
-      description: "ghlewis checks the black king again with his rook.",
-    },
-    {
-      index: 29,
-      move: "Rxb7",
-      description: "Black captures the pawn on g3 with his rook.",
-    },
-    {
-      index: 30,
-      move: "Nf6+",
-      description: "ghlewis checks the black king with his knight.",
-    },
-    {
-      index: 31,
-      move: "c6",
-      description: "Black moves the pawn to c6, preparing to queen a pawn.",
-    },
-    {
-      index: 32,
-      move: "Kb1",
-      description:
-        "ghlewis moves his king to b1, getting his king out of the way of the pawn on c6.",
-    },
-    {
-      index: 33,
-      move: "Ra7",
-      description:
-        "Black moves the rook to c2, attacking the white pawn on c3.",
-    },
-    {
-      index: 34,
-      move: "Rxh7#",
-      description: "ghlewis delivers a mate with his rook.",
-    },
-  ],
-};
+const operaGameText: string = `1. e4 {White opens with the king's pawn, claiming the center} e5 {Black responds symmetrically, establishing a classical pawn structure}
+2. Nf3 {White develops the knight, attacking the e5 pawn} d6 {Black defends the e5 pawn with a pawn, entering the Philidor's Defense}
+3. d4 {White challenges Black's pawn structure with a pawn break} Bg4 {Black pins the knight, discouraging White from capturing on e5}
+4. dxe5 {White captures the e5 pawn, disregarding the pin} Bxf3 {Black captures the knight, damaging White's pawn structure}
+5. Qxf3 {White recaptures with the queen, maintaining control of the center} dxe5 {Black recaptures the pawn, restoring material balance}
+6. Bc4 {White develops the bishop, attacking the vulnerable f7 square} Nf6 {Black develops the knight, defending f7 and controlling the center}
+7. Qb3 {White's queen attacks the b7 pawn and maintains pressure on f7} Qe7 {Black defends the b7 pawn and connects the rooks}
+8. Nc3 {White develops the knight, preparing to castle queenside} c6 {Black solidifies the pawn structure and restricts the scope of White's pieces}
+9. Bg5 {White pins the f6 knight, putting pressure on Black's position} b5 {Black attacks the bishop, aiming to disrupt White's coordination}
+10. Nxb5 {White captures the b5 pawn with the knight, exploiting Black's pawn weakness} cxb5 {Black recaptures the pawn, opening the c-file}
+11. Bxb5+ {White checks with the bishop, forcing a response} Nbd7 {Black blocks the check with the knight, defending the king}
+12. O-O-O {White castles queenside, connecting the rooks and targeting the d7 knight} Rd8 {Black challenges White's rook and defends the knight}
+13. Rxd7 {White sacrifices the rook to expose Black's king} Rxd7 {Black recaptures the rook, accepting the sacrifice}
+14. Rd1 {White places the rook on the open file, attacking the pinned knight} Qe6 {Black defends the knight with the queen, reinforcing the pin}
+15. Bxd7+ {White captures the knight, forcing Black's queen to recapture} Nxd7 {Black recaptures with the other knight, maintaining material balance}
+16. Qb8+ {White checks with the queen, forcing a response} Nxb8 {Black blocks the check with the knight, offering a queen trade}
+17. Rd8# {White delivers checkmate with the rook, ending the game} 0-1
+
+This game, known as the Opera Game, showcases Paul Morphy's brilliant attacking play and tactical vision. Despite facing two opponents consulting together, Morphy outplayed them with a series of sacrifices and precise moves, ultimately delivering a stunning checkmate. The game serves as a shining example of the importance of rapid development, coordination, and control of open lines.
+`;
 
 const configuration = new Configuration({
   apiKey: process.env.OPEN_AI_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-export type MoveDescription = {
-  index: number;
+export interface MoveDescription {
+  color: "white" | "black";
   move: string;
   description: string;
+}
+
+export interface TurnDescription {
+  white: MoveDescription;
+  black?: MoveDescription;
+}
+
+export interface ReviewedGame {
+  turnDescriptions: TurnDescription[];
+  overallDescription: string;
+}
+
+const parseMoveDescription = (
+  moveWithDescription: string,
+  color: "white" | "black"
+): MoveDescription => {
+  const regex = /(\S+)\s+\{([^}]+)\}/;
+  const match = moveWithDescription.match(regex);
+
+  if (match) {
+    const [, move, description] = match;
+    return {
+      color,
+      move,
+      description: description.trim(),
+    };
+  }
+
+  return { color: "white", move: "", description: "" };
 };
 
-const parseGameText = (
-  gameText: string
-): { moveDescriptions: MoveDescription[]; overallDescription: string } => {
-  const moveDescriptions: MoveDescription[] = [];
-  const overallDescriptionLines: string[] = [];
+const parseGameText = (gameText: string): ReviewedGame => {
+  const lines = gameText.split("\n");
+  const turnDescriptions: TurnDescription[] = [];
 
-  const moveLines = gameText.split("\n");
-  const moveRegex = /^(\d+)\. (\S+)\s+(.+)$/;
+  for (const line of lines) {
+    const regex = /^\d+\.\s+((\S+)\s+\{[^}]+\})(\s+((\S+)\s+\{[^}]+\}))?/;
+    const match = line.match(regex);
 
-  let reachedOverallDescription = false;
-
-  for (const line of moveLines) {
-    if (!reachedOverallDescription) {
-      const match = line.match(moveRegex);
-      if (match) {
-        moveDescriptions.push({
-          index: parseInt(match[1], 10),
-          move: match[2],
-          description: match[3],
-        });
-      } else {
-        reachedOverallDescription = true;
-      }
-    }
-
-    if (reachedOverallDescription) {
-      overallDescriptionLines.push(line.trim());
+    if (match) {
+      const [, whiteMove, , blackMove] = match;
+      const whiteMoveDescription = parseMoveDescription(whiteMove, "white");
+      const blackMoveDescription = blackMove
+        ? parseMoveDescription(blackMove, "black")
+        : undefined;
+      turnDescriptions.push({
+        white: whiteMoveDescription,
+        black: blackMoveDescription,
+      });
     }
   }
 
+  const overallDescription = lines[lines.length - 1];
   return {
-    moveDescriptions,
-    overallDescription: overallDescriptionLines.join("\n"),
+    turnDescriptions,
+    overallDescription,
   };
+};
+
+export const getMoveDescriptions = (
+  parsedGame: ReviewedGame
+): MoveDescription[] => {
+  const { turnDescriptions } = parsedGame;
+  const moveDescriptions: MoveDescription[] = [];
+  for (const turnDescription of turnDescriptions) {
+    moveDescriptions.push(turnDescription.white);
+    if (turnDescription.black) {
+      moveDescriptions.push(turnDescription.black);
+    }
+  }
+  return moveDescriptions;
 };
 
 export default async function handler(
@@ -252,7 +122,9 @@ export default async function handler(
   const { pgn, debug } = req.body;
 
   if (debug) {
-    res.status(200).json(dummyResult);
+    const response = operaGameText;
+    const reviewedGame = parseGameText(response);
+    res.status(200).json({ response, reviewedGame });
   }
 
   try {
@@ -282,10 +154,13 @@ export default async function handler(
 
     try {
       //const annotatedPgn = convertToPgn(response);
-      // TODO: Parase to moves
-      const { moveDescriptions, overallDescription } = parseGameText(response);
+      // TODO: handle 'continue'
+      const reviewedGame = parseGameText(response);
 
-      res.status(200).json({ response, moveDescriptions, overallDescription });
+      res.status(200).json({
+        response,
+        reviewedGame,
+      });
     } catch (pgnError) {
       console.error("PGN conversion error:", pgnError);
       res.status(500).json({

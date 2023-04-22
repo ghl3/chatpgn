@@ -9,8 +9,8 @@ import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
 import styles from "../styles/Review.module.css";
-import { MoveDescription } from "./api/reviewGame";
 import { useChessboard } from "@/hooks/UseChessboard";
+import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
 
 const Review = () => {
   const chessboardData = useChessboard();
@@ -30,12 +30,16 @@ const Review = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log("Fetching Game");
     setIsLoading(true);
     setLoadingMessage("Fetching game...");
     chessboardData.clearGame();
 
     try {
-      const gameResponse = await axios.post("/api/fetchGame", { gameId });
+      const gameResponse = await axios.post("/api/fetchGame", {
+        gameId,
+        debug: true,
+      });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
       chessboardData.loadGame(game);
@@ -48,9 +52,9 @@ const Review = () => {
         pgn: chessComGame.game.pgn,
         debug: true,
       });
-      const { moveDescriptions, overallDescription } = reviewResponse.data;
-      setMoveDescriptions(moveDescriptions);
-      setOverallDescription(overallDescription);
+      const { reviewedGame } = reviewResponse.data;
+      setMoveDescriptions(getMoveDescriptions(reviewedGame));
+      setOverallDescription(reviewedGame.overallDescription);
       setDescriptionFromIndex(chessboardData.moveIndex);
       console.log("Annotated game:", moveDescriptions);
       console.log("Annotated game:", overallDescription);

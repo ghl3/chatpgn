@@ -6,55 +6,63 @@ import { MoveIndex } from "@/chess/MoveIndex";
 import { GameState, Position } from "@/chess/Position";
 import { Chess } from "chess.js";
 
+const operaGamePgn: string = `[Event "Casual Game"]
+[Site "Le Café de la Régence, Paris FRA"]
+[Date "1858.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Paul Morphy"]
+[Black "Duke Karl / Count Isouard"]
+[ECO "C41"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "46"]
+
+1.e4 e5
+2.Nf3 d6
+3.d4 Bg4
+4.dxe5 Bxf3
+5.Qxf3 dxe5
+6.Bc4 Nf6
+7.Qb3 Qe7
+8.Nc3 c6
+9.Bg5 b5
+10.Nxb5 cxb5
+11.Bxb5+ Nbd7
+12.O-O-O Rd8
+13.Rxd7 Rxd7
+14.Rd1 Qe6
+15.Bxd7+ Nxd7
+16.Qb8+ Nxb8
+17.Rd8# 0-1`;
+
 export interface ChessComGameData {
   game: ChessComGame;
   players: ChessComPlayers;
 }
 
 export interface ChessComGame {
-  colorOfWinner: string;
   id: number;
-  uuid: string;
-  initialSetup: string;
-
-  isCheckmate: boolean;
-  isStalemate: boolean;
-  isFinished: boolean;
-  isRated: boolean;
-  isResignable: boolean;
-  lastMove: string;
-  moveList: string;
-
-  ratingChangeWhite: number;
-  ratingChangeBlack: number;
-  resultMessage: string;
-  endTime: number;
-  turnColor: string;
-  type: string;
-  typeName: string;
-
-  pgnHeaders: ChessComPGNHeaders;
-  moveTimestamps: string;
-  baseTime1: number;
-  timeIncrement1: number;
   pgn: string;
+  pgnHeaders?: ChessComPGNHeaders;
 }
 
 export interface ChessComPGNHeaders {
-  Event: string;
-  Site: string;
-  Date: string;
-  White: string;
-  Black: string;
-  Result: string;
-  ECO: string;
-  WhiteElo: number;
-  BlackElo: number;
-  TimeControl: string;
-  EndTime: string;
-  Termination: string;
-  SetUp: string;
-  FEN: string;
+  Event?: string;
+  Site?: string;
+  Date?: string;
+  White?: string;
+  Black?: string;
+  Result?: string;
+  ECO?: string;
+  WhiteElo?: number;
+  BlackElo?: number;
+  TimeControl?: string;
+  EndTime?: string;
+  Termination?: string;
+  SetUp?: string;
+  FEN?: string;
 }
 
 export interface ChessComPlayers {
@@ -63,10 +71,7 @@ export interface ChessComPlayers {
 }
 
 export interface ChessComPlayer {
-  id: number;
-  canWinOnTime: boolean;
   color: string;
-  turnTimeRemaining: string;
   username: string;
 }
 
@@ -144,10 +149,25 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { gameId } = req.body;
+  const { gameId, debug } = req.body;
 
   if (!gameId) {
     return res.status(400).json({ error: "Game ID is required" });
+  }
+
+  if (debug) {
+    const chessComGame: ChessComGameData = {
+      game: {
+        id: 123456,
+        pgn: operaGamePgn,
+      },
+      players: {
+        top: { color: "white", username: "morphy" },
+        bottom: { color: "black", username: "duke" },
+      },
+    };
+
+    return res.status(200).json(chessComGame);
   }
 
   try {
