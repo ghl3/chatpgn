@@ -1,0 +1,57 @@
+.GameReview {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background: #1e1e1e;
+  color: white;
+}
+
+.Header {
+  min-height: 50px;
+  margin: 12px 12px;
+}
+
+.MoveSummary {
+  min-height: 100px;
+}
+
+.UserConfig {
+  min-height: 100px;
+}
+
+.GameCounts {
+  min-height: 100px;
+}
+
+a {
+  color: #3498db;
+}
+
+button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+
+  color: white;
+  padding: 8px 16px;
+  margin: 0 12px;
+  border: 2px solid white;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.15s ease-in-out;
+
+  /*
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  */
+}
+
+.opensource {
+  text-align: center;
+  color: #aaa;
+}

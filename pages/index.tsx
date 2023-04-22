@@ -9,6 +9,7 @@ import { ParseTree, parseGame } from "@mliebelt/pgn-parser";
 import { annotatePgn } from "../utils/annotatePgn";
 import { Persona } from "../utils/persona";
 import Image from "next/image";
+import Header from "../components/Header"; // Import Header component
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");
@@ -47,6 +48,7 @@ export default function Home() {
 
   return (
     <>
+      <Header /> {/* Include Header component */}
       <Head>
         <title>ChatPGN</title>
         <meta name="description" content="Text and file input" />
