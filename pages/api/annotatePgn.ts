@@ -2,7 +2,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Persona } from "../../utils/persona";
 import { Configuration, OpenAIApi } from "openai";
-import { systemPrompt } from "@/utils/prompts";
+import { systemPrompt } from "@/utils/pgnPrompts";
 import { pgnToString } from "@/utils/pgnToString";
 import { parseGame, ParseTree } from "@mliebelt/pgn-parser";
 

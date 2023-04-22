@@ -114,6 +114,12 @@ export const parseGame = (game: ChessComGameData): Game => {
       moveIndex.moveNumber += 1;
     }
   }
+  // Capture the final position
+  positions.push({
+    moveIndex: { ...moveIndex },
+    fen: incremental_game.fen(),
+    gameState: getGameState(incremental_game),
+  });
 
   const white =
     game.players.top.color === "white" ? game.players.top : game.players.bottom;
@@ -133,7 +139,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { gameId } = req.query;
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { gameId } = req.body;
 
   if (!gameId) {
     return res.status(400).json({ error: "Game ID is required" });
