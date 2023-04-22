@@ -71,6 +71,7 @@ const parseMoveDescription = (
 const parseGameText = (gameText: string): ReviewedGame => {
   const lines = gameText.split("\n");
   const turnDescriptions: TurnDescription[] = [];
+  const overallDescriptionText: string[] = [];
 
   for (const line of lines) {
     const regex = /^\d+\.\s+((\S+)\s+\{[^}]+\})(\s+((\S+)\s+\{[^}]+\}))?/;
@@ -86,10 +87,12 @@ const parseGameText = (gameText: string): ReviewedGame => {
         white: whiteMoveDescription,
         black: blackMoveDescription,
       });
+    } else {
+      overallDescriptionText.push(line);
     }
   }
 
-  const overallDescription = lines[lines.length - 1];
+  const overallDescription = overallDescriptionText.join("\n");
   return {
     turnDescriptions,
     overallDescription,

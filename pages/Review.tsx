@@ -28,59 +28,13 @@ const Review = () => {
     string | null
   >(null);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("Fetching Game");
-    setIsLoading(true);
-    setLoadingMessage("Fetching game...");
-    chessboardData.clearGame();
-
-    try {
-      const gameResponse = await axios.post("/api/fetchGame", {
-        gameId,
-        debug: true,
-      });
-      const chessComGame: ChessComGameData = gameResponse.data;
-      const game: Game = parseGame(chessComGame);
-      chessboardData.loadGame(game);
-      console.log(game);
-
-      setLoadingMessage("Annotating game...");
-
-      // TODO: Send a parsed and evaluated game pgn
-      const reviewResponse = await axios.post("/api/reviewGame", {
-        pgn: chessComGame.game.pgn,
-        debug: true,
-      });
-      const { reviewedGame } = reviewResponse.data;
-      setMoveDescriptions(getMoveDescriptions(reviewedGame));
-      setOverallDescription(reviewedGame.overallDescription);
-      setDescriptionFromIndex(chessboardData.moveIndex);
-      console.log("Annotated game:", moveDescriptions);
-      console.log("Annotated game:", overallDescription);
-    } catch (error) {
-      console.error("Error fetching the game data:", error);
-    } finally {
-      setIsLoading(false);
-      setLoadingMessage("");
-    }
-  };
-
   const setDescriptionFromIndex = (positionIndex: number) => {
-    console.log(
-      "Setting description from index: ",
-      positionIndex,
-      " of ",
-      moveDescriptions?.length
-    );
-    if (moveDescriptions) {
-      if (positionIndex == 0) {
-        setCurrentMoveDescription(overallDescription);
-      } else {
-        setCurrentMoveDescription(
-          moveDescriptions[positionIndex - 1].description
-        );
-      }
+    if (positionIndex == 0) {
+      setCurrentMoveDescription(overallDescription);
+    } else if (moveDescriptions) {
+      setCurrentMoveDescription(
+        moveDescriptions[positionIndex - 1].description
+      );
     } else {
       setCurrentMoveDescription(null);
     }
@@ -123,6 +77,38 @@ const Review = () => {
     }
   };
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setLoadingMessage("Fetching game...");
+    chessboardData.clearGame();
+
+    try {
+      const gameResponse = await axios.post("/api/fetchGame", {
+        gameId,
+        debug: true,
+      });
+      const chessComGame: ChessComGameData = gameResponse.data;
+      const game: Game = parseGame(chessComGame);
+      chessboardData.loadGame(game);
+      setLoadingMessage("Annotating game...");
+      // TODO: Send a parsed and evaluated game pgn
+      const reviewResponse = await axios.post("/api/reviewGame", {
+        pgn: chessComGame.game.pgn,
+        debug: true,
+      });
+      const { reviewedGame } = reviewResponse.data;
+      setMoveDescriptions(getMoveDescriptions(reviewedGame));
+      setOverallDescription(reviewedGame.overallDescription);
+      setCurrentMoveDescription(reviewedGame.overallDescription);
+    } catch (error) {
+      console.error("Error fetching the game data:", error);
+    } finally {
+      setIsLoading(false);
+      setLoadingMessage("");
+    }
+  };
+
   return (
     <>
       <Head>
@@ -158,12 +144,10 @@ const Review = () => {
         </div>
 
         <div className="ui grid container">
-          <div className={`${styles.YourCustomStyle} ten wide column`}>
-            <div
-              className={`${styles.YourCustomStyle} ui center aligned one column grid`}
-            >
-              <div className={`${styles.YourCustomStyle} row`}>
-                <div className={`${styles.YourCustomStyle} Chessboard`}>
+          <div className="ten wide column">
+            <div className="ui center aligned one column grid">
+              <div className="row">
+                <div className="Chessboard">
                   <Chessboard
                     position={chessboardData.getPositionFen()}
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
@@ -208,15 +192,15 @@ const Review = () => {
               </div>
             </div>
 
-            <div className={`${styles.YourCustomStyle} ten wide column`}>
-              <div
-                className={`${styles.YourCustomStyle} ui center aligned one column grid`}
-              >
-                {currentMoveDescription && (
-                  <p className={styles.overallDescription}>
-                    {currentMoveDescription}
-                  </p>
-                )}
+            <div className="ten wide column">
+              <div className={styles.descriptionContainer}>
+                <p
+                  className={classNames(styles.descriptionText, {
+                    [styles.hidden]: !currentMoveDescription,
+                  })}
+                >
+                  {currentMoveDescription || " "}
+                </p>
               </div>
             </div>
           </div>
