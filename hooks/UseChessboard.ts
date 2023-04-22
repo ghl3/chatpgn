@@ -10,8 +10,13 @@ export const useChessboard = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [moveIndex, setMoveIndex] = useState<number>(0);
   const [position, setPosition] = useState<Position | null>(null);
-
   const [boardSize, setBoardSize] = useState<number>(600);
+
+  const loadGame = (game: Game) => {
+    setGame(game);
+    setPosition(game.positions[0]);
+    setMoveIndex(0);
+  };
 
   const setPositionFromIndex = (moveIndex: number) => {
     if (game) {
@@ -77,12 +82,20 @@ export const useChessboard = () => {
     window.addEventListener("resize", resizeBoard);
   }, []);
 
+  const clearGame = () => {
+    setGame(null);
+    setMoveIndex(0);
+    setPosition(null);
+  };
+
   return {
     game,
-    setGame,
-    setPositionFromIndex,
+    moveIndex,
     getPositionFen,
     getBoardOrientation,
     boardSize,
+    clearGame,
+    loadGame,
+    setPositionFromIndex,
   };
 };

@@ -1,6 +1,7 @@
 // pages/review.tsx
 
 import React, { useState, FormEvent } from "react";
+import classNames from "classnames";
 
 import Head from "next/head";
 import axios from "axios";
@@ -31,13 +32,13 @@ const Review = () => {
     event.preventDefault();
     setIsLoading(true);
     setLoadingMessage("Fetching game...");
+    chessboardData.clearGame();
 
     try {
       const gameResponse = await axios.post("/api/fetchGame", { gameId });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
-      chessboardData.setGame(game);
-      chessboardData.setPositionFromIndex(0);
+      chessboardData.loadGame(game);
       console.log(game);
 
       setLoadingMessage("Annotating game...");
@@ -45,11 +46,14 @@ const Review = () => {
       // TODO: Send a parsed and evaluated game pgn
       const reviewResponse = await axios.post("/api/reviewGame", {
         pgn: chessComGame.game.pgn,
+        debug: true,
       });
       const { moveDescriptions, overallDescription } = reviewResponse.data;
       setMoveDescriptions(moveDescriptions);
       setOverallDescription(overallDescription);
-      setCurrentMoveDescirption(chessboardData.moveIndex);
+      setDescriptionFromIndex(chessboardData.moveIndex);
+      console.log("Annotated game:", moveDescriptions);
+      console.log("Annotated game:", overallDescription);
     } catch (error) {
       console.error("Error fetching the game data:", error);
     } finally {
@@ -58,12 +62,20 @@ const Review = () => {
     }
   };
 
-  const setCurrentMoveDescirption = (moveIndex: number) => {
+  const setDescriptionFromIndex = (positionIndex: number) => {
+    console.log(
+      "Setting description from index: ",
+      positionIndex,
+      " of ",
+      moveDescriptions?.length
+    );
     if (moveDescriptions) {
-      if (moveIndex == 0) {
+      if (positionIndex == 0) {
         setCurrentMoveDescription(overallDescription);
       } else {
-        setCurrentMoveDescription(moveDescriptions[moveIndex - 1].description);
+        setCurrentMoveDescription(
+          moveDescriptions[positionIndex - 1].description
+        );
       }
     } else {
       setCurrentMoveDescription(null);
@@ -72,19 +84,30 @@ const Review = () => {
 
   const setGamePosition = (moveIndex: number) => {
     chessboardData.setPositionFromIndex(moveIndex);
-    setCurrentMoveDescirption(moveIndex);
+    setDescriptionFromIndex(moveIndex);
   };
 
   const handleLeftClick = () => {
+    if (chessboardData.moveIndex <= 0) {
+      return;
+    }
     setGamePosition(chessboardData.moveIndex - 1);
   };
 
   const handleRightClick = () => {
+    if (
+      chessboardData.moveIndex + 1 ==
+      chessboardData.game?.positions?.length
+    ) {
+      return;
+    }
     setGamePosition(chessboardData.moveIndex + 1);
   };
 
   const handleJumpToStart = () => {
-    setGamePosition(0);
+    if (chessboardData.game) {
+      setGamePosition(0);
+    }
   };
 
   const handleJumpToEnd = () => {
@@ -107,19 +130,28 @@ const Review = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.GameReview}>
-        <h1>Enter Chess.com Game ID</h1>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="game-id">Game ID:</label>
-          <input
-            type="text"
-            id="game-id"
-            value={gameId}
-            onChange={(e) => setGameId(e.target.value)}
-          />
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? loadingMessage : "Review"}
-          </button>
-        </form>
+        <div className={styles.formContainer}>
+          <h1>Enter Chess.com Game ID</h1>
+          <form onSubmit={handleSubmit} className={styles.gameIdForm}>
+            <label htmlFor="game-id">Game ID:</label>
+            <input
+              type="text"
+              id="game-id"
+              value={gameId}
+              onChange={(e) => setGameId(e.target.value)}
+            />
+            <button type="submit" disabled={isLoading}>
+              Review
+            </button>
+          </form>
+          <p
+            className={classNames(styles.loadingMessage, {
+              [styles.hidden]: !loadingMessage,
+            })}
+          >
+            {loadingMessage || " "}
+          </p>
+        </div>
 
         <div className="ui grid container">
           <div className={`${styles.YourCustomStyle} ten wide column`}>
@@ -133,7 +165,7 @@ const Review = () => {
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
                     boardWidth={chessboardData.boardSize}
                     areArrowsAllowed={true}
-                    boardOrientation={chessboardData.getBoardOrientation()}
+                    boardOrientation={"white"} //chessboardData.getBoardOrientation()}
                   />
                 </div>
               </div>
@@ -143,24 +175,28 @@ const Review = () => {
                   <button
                     className={`${styles.localButton} ui small button`}
                     onClick={handleJumpToStart}
+                    disabled={isLoading}
                   >
                     &laquo;
                   </button>
                   <button
                     className={`${styles.localButton} ui small button`}
                     onClick={handleLeftClick}
+                    disabled={isLoading}
                   >
                     &larr;
                   </button>
                   <button
                     className={`${styles.localButton} ui small button`}
                     onClick={handleRightClick}
+                    disabled={isLoading}
                   >
                     &rarr;
                   </button>
                   <button
                     className={`${styles.localButton} ui small button`}
                     onClick={handleJumpToEnd}
+                    disabled={isLoading}
                   >
                     &raquo;
                   </button>
