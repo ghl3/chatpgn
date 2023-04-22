@@ -9,6 +9,7 @@ import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
 import { Position } from "@/chess/Position";
 import { Fen } from "@/chess/Fen";
+import styles from "../styles/Review.module.css";
 
 const defaultFen: Fen =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -99,6 +100,21 @@ const Review = () => {
     }
   };
 
+  const handleJumpToStart = () => {
+    if (game) {
+      setMoveIndex(0);
+      setPosition(game.positions[0]);
+    }
+  };
+
+  const handleJumpToEnd = () => {
+    if (game) {
+      const endIndex = game.positions.length - 1;
+      setMoveIndex(endIndex);
+      setPosition(game.positions[endIndex]);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -124,11 +140,13 @@ const Review = () => {
           </button>
         </form>
 
-        <div className="ui grid container">
-          <div className="ten wide column">
-            <div className="ui center aligned one column grid">
-              <div className="row">
-                <div className="Chessboard">
+        <div className={`${styles.GameReview} ui grid container`}>
+          <div className={`${styles.YourCustomStyle} ten wide column`}>
+            <div
+              className={`${styles.YourCustomStyle} ui center aligned one column grid`}
+            >
+              <div className={`${styles.YourCustomStyle} row`}>
+                <div className={`${styles.YourCustomStyle} Chessboard`}>
                   <Chessboard
                     position={position !== null ? position.fen : defaultFen}
                     customLightSquareStyle={{ backgroundColor: "#95a5a6" }}
@@ -139,18 +157,32 @@ const Review = () => {
                   />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="ui grid container">
-          <div className="ten wide column">
-            <div className="ui center aligned one column grid">
               <div className="row">
-                <button onClick={handleLeftClick}>&larr;</button>
-                <button onClick={handleRightClick}>&rarr;</button>
+                <button
+                  className={styles.localButton}
+                  onClick={handleJumpToStart}
+                >
+                  &laquo;
+                </button>
+                <button
+                  className={styles.localButton}
+                  onClick={handleLeftClick}
+                >
+                  &larr;
+                </button>
+                <button
+                  className={styles.localButton}
+                  onClick={handleRightClick}
+                >
+                  &rarr;
+                </button>
+                <button
+                  className={styles.localButton}
+                  onClick={handleJumpToEnd}
+                >
+                  &raquo;
+                </button>
               </div>
-              <div className="row">{/* ... (chessboard code) */}</div>
             </div>
           </div>
         </div>
