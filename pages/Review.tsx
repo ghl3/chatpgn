@@ -1,27 +1,29 @@
 // pages/review.tsx
 
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
 
 import Head from "next/head";
 import axios from "axios";
 import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
-import { Position } from "@/chess/Position";
 import { Fen } from "@/chess/Fen";
 import styles from "../styles/Review.module.css";
 import { MoveDescription } from "./api/reviewGame";
+import { useChessboard } from "@/hooks/UseChessboard";
 
-const defaultFen: Fen =
-  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+//const defaultFen: Fen =
+//  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 const Review = () => {
+  const chessboardData = useChessboard();
+
   const [gameId, setGameId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-  const [game, setGame] = useState<Game | null>(null);
-  const [moveIndex, setMoveIndex] = useState<number>(0);
-  const [position, setPosition] = useState<Position | null>(null);
+  //const [game, setGame] = useState<Game | null>(null);
+  //const [moveIndex, setMoveIndex] = useState<number>(0);
+  //const [position, setPosition] = useState<Position | null>(null);
   const [moveDescriptions, setMoveDescriptions] = useState<
     MoveDescription[] | null
   >(null);
@@ -33,8 +35,9 @@ const Review = () => {
   >(null);
 
   // Definet the app level state
-  const [boardSize, setBoardSize] = useState<number>(600);
+  //const [boardSize, setBoardSize] = useState<number>(600);
 
+  /*
   // Ensure the board is always sized correctly
   useEffect(() => {
     // Initialize the board
@@ -72,6 +75,7 @@ const Review = () => {
 
     window.addEventListener("resize", resizeBoard);
   }, []);
+  */
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -82,8 +86,8 @@ const Review = () => {
       const gameResponse = await axios.post("/api/fetchGame", { gameId });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
-      setGame(game);
-      setPosition(game.positions[0]);
+      chessboardData.setGame(game);
+      chessboardData.setPositionFromIndex(0); //(game.positions[0]);
       console.log(game);
 
       setLoadingMessage("Annotating game...");
@@ -95,7 +99,7 @@ const Review = () => {
       const { moveDescriptions, overallDescription } = reviewResponse.data;
       setMoveDescriptions(moveDescriptions);
       setOverallDescription(overallDescription);
-      setCurrentMoveDescirption(moveIndex);
+      setCurrentMoveDescirption(chessboardData.moveIndex);
     } catch (error) {
       console.error("Error fetching the game data:", error);
     } finally {
@@ -117,39 +121,28 @@ const Review = () => {
   };
 
   const setGamePosition = (moveIndex: number) => {
-    if (game) {
-      setMoveIndex(moveIndex);
-      setPosition(game.positions[moveIndex]);
-      setCurrentMoveDescirption(moveIndex);
-    }
+    chessboardData.setPositionFromIndex(moveIndex);
+    setCurrentMoveDescirption(moveIndex);
   };
 
   const handleLeftClick = () => {
-    if (game && moveIndex > 0) {
-      if (moveIndex > 0) {
-        setGamePosition(moveIndex - 1);
-      }
-    }
+    setGamePosition(chessboardData.moveIndex - 1);
   };
 
   const handleRightClick = () => {
-    if (game && moveIndex < game.positions.length - 1) {
-      if (game && moveIndex < game.positions.length - 1) {
-        setGamePosition(moveIndex + 1);
-      }
-    }
+    setGamePosition(chessboardData.moveIndex + 1);
   };
 
   const handleJumpToStart = () => {
-    if (game) {
-      setGamePosition(0);
-    }
+    setGamePosition(0);
   };
 
   const handleJumpToEnd = () => {
-    if (game) {
-      const endIndex = game.positions.length - 1;
+    if (chessboardData.game) {
+      const endIndex = chessboardData.game.positions.length - 1;
       setGamePosition(endIndex);
+    } else {
+      setGamePosition(0);
     }
   };
 
@@ -186,12 +179,11 @@ const Review = () => {
               <div className={`${styles.YourCustomStyle} row`}>
                 <div className={`${styles.YourCustomStyle} Chessboard`}>
                   <Chessboard
-                    position={position !== null ? position.fen : defaultFen}
-                    customLightSquareStyle={{ backgroundColor: "#95a5a6" }}
+                    position={chessboardData.getPositionFen()}
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
-                    boardWidth={boardSize}
+                    boardWidth={chessboardData.boardSize}
                     areArrowsAllowed={true}
-                    boardOrientation={"white"}
+                    boardOrientation={chessboardData.getBoardOrientation()}
                   />
                 </div>
               </div>
