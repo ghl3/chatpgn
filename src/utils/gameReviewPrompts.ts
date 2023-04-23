@@ -3,6 +3,9 @@ import { Persona } from "./persona";
 const SYSTEM_PROMPT: string = `You are a Chess PGN game reviewer.
 I'm going to give you a PGN.  I want you to do a move-by-move description and review of the game.
 The comments should be aimed at a high level, so they should be advanced and instructive.
+The PGN will contain comments, and the comments will contain position and move evaluations.
+You should use those comments and evaluations where appropriate (for example, pointing out
+blunders and alternative moves).
 
 You should output data in the following format:
 1. <white MOVE> {<DESCRIPTION>} <black MOVE> {<DESCRIPTION>}

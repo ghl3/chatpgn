@@ -146,7 +146,11 @@ const makeMoveComment = (
 
 const createEvaluatedPgn = (evaluatedGame: EvaluatedGame): string => {
   const pgnLines: string[] = [];
-  //let gameMove: number = 1;
+
+  pgnLines.push(`[White "${evaluatedGame.white}"]\n`);
+  pgnLines.push(`[Black "${evaluatedGame.black}"]\n`);
+  pgnLines.push("\n");
+
   for (const [index, move] of evaluatedGame.moves.entries()) {
     const color = index % 2 === 0 ? "w" : "b";
     const gameMoveNumber = Math.floor(index / 2) + 1;
