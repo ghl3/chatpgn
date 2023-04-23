@@ -61,28 +61,11 @@ export const useChessboard = () => {
 
     const resizeBoard = () => {
       const [vw, vh] = getViewportSizes();
-
       // The board should be no more than 1/3 the width
       // We round to the nearest 10px
-      const newBoardSize = Math.floor(Math.min(vw / 3, vh - 250) / 10) * 10;
+      const frac = 3;
+      const newBoardSize = Math.floor(Math.min(vw / frac, vh - 250) / 10) * 10;
       setBoardSize(newBoardSize);
-
-      /*
-      const UiHeight = 250;
-      let newBoardSize;
-
-      if (vw > vh) {
-        newBoardSize = vh - UiHeight;
-      } else {
-        if (vh - vw <= UiHeight) {
-          newBoardSize = vh - UiHeight;
-        } else {
-          newBoardSize = vw - 52;
-        }
-      }
-
-      setBoardSize(newBoardSize);
-      */
     };
 
     resizeBoard();
