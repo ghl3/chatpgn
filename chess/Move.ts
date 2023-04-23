@@ -3,7 +3,6 @@ export interface Move {
   to: string;
   promotion?: string | undefined;
   color: "w" | "b";
-
   piece?: string;
   san?: string;
 }
