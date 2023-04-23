@@ -11,6 +11,13 @@ import { Chessboard } from "react-chessboard";
 import styles from "../styles/Review.module.css";
 import { useChessboard } from "@/hooks/UseChessboard";
 import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
+import { Engine } from "@/engine/Engine";
+
+// Only run the engine on the client.
+let engine: Engine | null = null;
+if (typeof window !== "undefined") {
+  engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 1, false);
+}
 
 const Review = () => {
   const chessboardData = useChessboard();
@@ -27,6 +34,25 @@ const Review = () => {
   const [currentMoveDescription, setCurrentMoveDescription] = useState<
     string | null
   >(null);
+
+  const evaluateGame = async (game: Game) => {
+    if (!engine) {
+      return;
+    }
+
+    for (const position of game.positions) {
+      const fen = position.fen;
+      const result = await engine.evaluatePosition(fen);
+      console.log(
+        "FEN:",
+        fen,
+        "Score:",
+        result.evaluation,
+        "Move:",
+        result.best_moves.length > 0 ? result.best_moves[0] : "None"
+      );
+    }
+  };
 
   const setDescriptionFromIndex = (positionIndex: number) => {
     if (positionIndex == 0) {
@@ -91,6 +117,11 @@ const Review = () => {
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
       chessboardData.loadGame(game);
+
+      setLoadingMessage("Evaluating game...");
+
+      const evauatedGame = await evaluateGame(game);
+
       setLoadingMessage("Annotating game...");
       // TODO: Send a parsed and evaluated game pgn
       const reviewResponse = await axios.post("/api/reviewGame", {
