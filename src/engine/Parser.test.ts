@@ -1,4 +1,4 @@
-import { EventParser } from "../engine/Parser";
+import { EventParser } from "./Parser";
 
 test("parse readyok", () => {
   const res = EventParser.parse("readyok");

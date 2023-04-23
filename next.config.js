@@ -4,9 +4,12 @@ const path = require("path");
 const nextConfig = {
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
-    config.resolve.alias["@/styles"] = path.join(__dirname, "styles");
-    config.resolve.alias["@/components"] = path.join(__dirname, "components");
-    config.resolve.alias["@/pages"] = path.join(__dirname, "pages");
+    config.resolve.alias["@/styles"] = path.join(__dirname, "src/styles");
+    config.resolve.alias["@/components"] = path.join(
+      __dirname,
+      "src/components"
+    );
+    config.resolve.alias["@/pages"] = path.join(__dirname, "src/pages");
 
     if (!isServer) {
       config.module.rules.push({

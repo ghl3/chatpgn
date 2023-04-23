@@ -6,4 +6,5 @@ module.exports = {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
   setupFilesAfterEnv: ["./jest.setup.ts"],
+  testMatch: ["<rootDir>/src/**/*.test.(ts|tsx)"],
 };
