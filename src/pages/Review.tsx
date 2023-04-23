@@ -14,6 +14,9 @@ import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
 import { Engine } from "@/engine/Engine";
 import { evaluateGame } from "@/utils/Evaluation";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
+import GameIdForm from "@/components/GameIdForm";
+import ControlButtons from "@/components/ControlButtons";
+import PositionDescription from "@/components/PositionDescription";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -149,28 +152,13 @@ const Review = () => {
           <div className="eight wide centered column">
             <div className="ui center aligned one column grid">
               <div className="row">
-                <div className={styles.formContainer}>
-                  <h1>Enter Chess.com Game ID</h1>
-                  <form onSubmit={handleSubmit} className={styles.gameIdForm}>
-                    <label htmlFor="game-id">Game ID:</label>
-                    <input
-                      type="text"
-                      id="game-id"
-                      value={gameId}
-                      onChange={(e) => setGameId(e.target.value)}
-                    />
-                    <button type="submit" disabled={isLoading}>
-                      Review
-                    </button>
-                  </form>
-                  <p
-                    className={classNames(styles.loadingMessage, {
-                      [styles.hidden]: !loadingMessage,
-                    })}
-                  >
-                    {loadingMessage || " "}
-                  </p>
-                </div>
+                <GameIdForm
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  loadingMessage={loadingMessage}
+                  gameId={gameId}
+                  setGameId={setGameId}
+                />
               </div>
 
               <div className="row">
@@ -180,54 +168,28 @@ const Review = () => {
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
                     boardWidth={chessboardData.boardSize}
                     areArrowsAllowed={true}
-                    boardOrientation={"white"} //chessboardData.getBoardOrientation()}
+                    boardOrientation={"white"}
                   />
                 </div>
               </div>
 
               <div className="row">
-                <div className="ui center aligned basic segment">
-                  <button
-                    className={`${styles.localButton} ui small button`}
-                    onClick={handleJumpToStart}
-                    disabled={isLoading}
-                  >
-                    &laquo;
-                  </button>
-                  <button
-                    className={`${styles.localButton} ui small button`}
-                    onClick={handleLeftClick}
-                    disabled={isLoading}
-                  >
-                    &larr;
-                  </button>
-                  <button
-                    className={`${styles.localButton} ui small button`}
-                    onClick={handleRightClick}
-                    disabled={isLoading}
-                  >
-                    &rarr;
-                  </button>
-                  <button
-                    className={`${styles.localButton} ui small button`}
-                    onClick={handleJumpToEnd}
-                    disabled={isLoading}
-                  >
-                    &raquo;
-                  </button>
-                </div>
+                <ControlButtons
+                  isLoading={isLoading}
+                  handleJumpToStart={handleJumpToStart}
+                  handleLeftClick={handleLeftClick}
+                  handleRightClick={handleRightClick}
+                  handleJumpToEnd={handleJumpToEnd}
+                />
               </div>
 
               <div className="row">
-                <div className={styles.descriptionContainer}>
-                  <p
-                    className={classNames(styles.descriptionText, {
-                      [styles.hidden]: !currentMoveDescription,
-                    })}
-                  >
-                    {currentMoveDescription || " "}
-                  </p>
-                </div>
+                <PositionDescription
+                  evaluatedPosition={
+                    evaluatedGame?.evaluatedPositions[chessboardData.moveIndex]
+                  }
+                  description={currentMoveDescription}
+                />
               </div>
             </div>
           </div>
