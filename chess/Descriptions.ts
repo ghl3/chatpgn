@@ -20,100 +20,135 @@ import { Move } from "./Move";
 // Number of moves that are mate for opponent
 // Is the current position a draw*
 // Does the move result in a draw*
-// 
+//
 
 export interface MoveDescription {
-    isBestMove: boolean;
-    isGoodMove: boolean;
-    maintainsAdvantage: boolean | null;
-    moveIndex: number | null;
+  isBestMove: boolean;
+  isGoodMove: boolean;
+  maintainsAdvantage: boolean | null;
+  moveIndex: number | null;
 
-    moveIsForcedMateForPlayer: boolean;
-    moveIsForcedMateForOpponent: boolean;
-    maintainsForcedMateFor: boolean | null;
-    blundersForcedMateAgainst: boolean | null;
-    maintainsForcedMateAgainst: boolean | null;
+  moveIsForcedMateForPlayer: boolean;
+  moveIsForcedMateForOpponent: boolean;
+  maintainsForcedMateFor: boolean | null;
+  blundersForcedMateAgainst: boolean | null;
+  maintainsForcedMateAgainst: boolean | null;
 
-    moveScore: number | null;
-    scoreDelta: number | null;
-    isDraw: boolean;
-    maintainsDraw: boolean | null;
+  moveScore: number | null;
+  scoreDelta: number | null;
+  isDraw: boolean;
+  maintainsDraw: boolean | null;
 }
 
 export interface PositionDescription {
-    numGoodMoves: number;
-    numMateForMoves: number;
-    numMovesMaintainAdvantage: number;
+  numGoodMoves: number;
+  numMateForMoves: number;
+  numMovesMaintainAdvantage: number;
 }
 
-const findMatchingMoveIdx = (moves: MoveAndEvaluation[], move: Move): number | null => {
-    for (const idx in moves) {
-        const currentMove = moves[idx].move;
-        if (currentMove.from === move.from && currentMove.to === move.to && currentMove?.promotion === move?.promotion) {
-            return parseInt(idx);
-        }
+const findMatchingMoveIdx = (
+  moves: MoveAndEvaluation[],
+  move: Move
+): number | null => {
+  for (const idx in moves) {
+    const currentMove = moves[idx].move;
+    if (
+      currentMove.from === move.from &&
+      currentMove.to === move.to &&
+      currentMove?.promotion === move?.promotion
+    ) {
+      return parseInt(idx);
     }
+  }
+  return null;
+};
+
+export const getColorIndependentScore = (
+  color: Color,
+  score: number
+): number => {
+  const colorFactor = color === "w" ? 1 : -1;
+  return score * colorFactor;
+};
+
+export const doesMaintainForcedMateFor = (
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): boolean | null => {
+  if (positionEvaluation?.forced_mate?.for !== "PLAYER") {
     return null;
-}
+  } else {
+    return moveEvaluation?.forced_mate?.for === "PLAYER";
+  }
+};
 
-export const getColorIndependentScore = (color: Color, score: number): number => {
-    const colorFactor = color === 'w' ? 1 : -1;
-    return score * colorFactor;
-}
+export const doesMaintainForcedMateAgainst = (
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): boolean | null => {
+  if (positionEvaluation?.forced_mate?.for === "OPPONENT") {
+    return moveEvaluation?.forced_mate?.for === "OPPONENT";
+  } else {
+    return null;
+  }
+};
 
-export const doesMaintainForcedMateFor = (moveEvaluation: Evaluation, positionEvaluation: Evaluation): boolean | null => {
-    if (positionEvaluation?.forced_mate?.for !== "PLAYER") {
-        return null;
-    } else {
-        return moveEvaluation?.forced_mate?.for === "PLAYER";
-    }
-}
+export const doesBlunderForcedMateAgainst = (
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): boolean => {
+  return (
+    positionEvaluation?.forced_mate?.for !== "OPPONENT" &&
+    moveEvaluation?.forced_mate?.for === "OPPONENT"
+  );
+};
 
-export const doesMaintainForcedMateAgainst = (moveEvaluation: Evaluation, positionEvaluation: Evaluation): boolean | null => {
-    if (positionEvaluation?.forced_mate?.for === 'OPPONENT') {
-        return moveEvaluation?.forced_mate?.for === 'OPPONENT';
-    } else {
-        return null;
-    }
-}
+export const doesMaintainAdvantage = (
+  turn: Color,
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): boolean => {
+  if (
+    doesMaintainForcedMateAgainst(moveEvaluation, positionEvaluation) ||
+    doesBlunderForcedMateAgainst(moveEvaluation, positionEvaluation)
+  ) {
+    return false;
+  }
+  if (moveEvaluation?.forced_mate?.for === "PLAYER") {
+    return true;
+  }
+  return (
+    moveEvaluation?.score != null &&
+    getColorIndependentScore(turn, moveEvaluation.score) > 0
+  );
+};
 
-export const doesBlunderForcedMateAgainst = (moveEvaluation: Evaluation, positionEvaluation: Evaluation): boolean => {
-    return positionEvaluation?.forced_mate?.for !== 'OPPONENT' &&
-        moveEvaluation?.forced_mate?.for === 'OPPONENT';
-}
+export const doesMaintainDraw = (
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): boolean | null => {
+  if (positionEvaluation?.score === 0) {
+    return moveEvaluation?.score === 0;
+  } else {
+    return null;
+  }
+};
 
-export const doesMaintainAdvantage = (turn: Color, moveEvaluation: Evaluation, positionEvaluation: Evaluation): boolean => {
-    if (doesMaintainForcedMateAgainst(moveEvaluation, positionEvaluation) ||
-        doesBlunderForcedMateAgainst(moveEvaluation, positionEvaluation)) {
-        return false;
-    }
-    if (moveEvaluation?.forced_mate?.for === "PLAYER") {
-        return true;
-    }
-    return moveEvaluation?.score != null && getColorIndependentScore(turn, moveEvaluation.score) > 0;
-}
-
-export const doesMaintainDraw = (moveEvaluation: Evaluation, positionEvaluation: Evaluation): boolean | null => {
-    if (positionEvaluation?.score === 0) {
-        return moveEvaluation?.score === 0;
-    } else {
-        return null;
-    }
-}
-
-export const getMoveScoreDelta = (turn: Color, moveEvaluation: Evaluation, positionEvaluation: Evaluation): number | null => {
-    const colorFactor = turn === 'w' ? 1 : -1;
-    if (positionEvaluation.score != null &&
-        moveEvaluation.score != null) {
-        return colorFactor * positionEvaluation.score - colorFactor * moveEvaluation.score;
-    } else {
-        return null;
-    }
-}
-
-
-
-
+export const getMoveScoreDelta = (
+  turn: Color,
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation
+): number | null => {
+  const colorFactor = turn === "w" ? 1 : -1;
+  if (positionEvaluation.score != null && moveEvaluation.score != null) {
+    return (
+      colorFactor * positionEvaluation.score -
+      colorFactor * moveEvaluation.score
+    );
+  } else {
+    return null;
+  }
+};
 
 /*
 // scoreThreshold: If the resulting score is greater than this threshold, we say the
@@ -163,83 +198,117 @@ const maintainsEvaluation = (color: Color, evaluation: Evaluation, referenceEval
 }
 */
 
-
-export const isGoodMove = (turn: Color, moveEvaluation: Evaluation, positionEvaluation: Evaluation,
-    scoreThreshold: number, scoreDropThreshold: number): boolean => {
-    if (doesMaintainForcedMateAgainst(moveEvaluation, positionEvaluation) ||
-        doesBlunderForcedMateAgainst(moveEvaluation, positionEvaluation)) {
-        return false;
-    }
-    if (moveEvaluation?.forced_mate?.for === "PLAYER") {
-        return true;
-    }
-
-    if (moveEvaluation.score != null && getColorIndependentScore(turn, moveEvaluation.score) >= scoreThreshold) {
-        return true;
-    }
-
-    const delta = getMoveScoreDelta(turn, moveEvaluation, positionEvaluation);
-
-    if (delta != null && delta < scoreDropThreshold) {
-        return true;
-    }
-
+export const isGoodMove = (
+  turn: Color,
+  moveEvaluation: Evaluation,
+  positionEvaluation: Evaluation,
+  scoreThreshold: number,
+  scoreDropThreshold: number
+): boolean => {
+  if (
+    doesMaintainForcedMateAgainst(moveEvaluation, positionEvaluation) ||
+    doesBlunderForcedMateAgainst(moveEvaluation, positionEvaluation)
+  ) {
     return false;
-}
+  }
+  if (moveEvaluation?.forced_mate?.for === "PLAYER") {
+    return true;
+  }
 
-export const makeMoveDescription = (move: Move, moveEvaluation: Evaluation, position: EvaluatedPosition): MoveDescription => {
+  if (
+    moveEvaluation.score != null &&
+    getColorIndependentScore(turn, moveEvaluation.score) >= scoreThreshold
+  ) {
+    return true;
+  }
 
-    const positionEvaluation = position.best_moves[0].evaluation;
-    const moveIdx = findMatchingMoveIdx(position.best_moves, move);
-    const scoreDelta = getMoveScoreDelta(move.color, moveEvaluation, positionEvaluation);
+  const delta = getMoveScoreDelta(turn, moveEvaluation, positionEvaluation);
 
-    return {
-        isBestMove: moveIdx === 0,
-        isGoodMove: isGoodMove(move.color, moveEvaluation, positionEvaluation, 300, 50),
-        maintainsAdvantage: doesMaintainAdvantage(move.color, moveEvaluation, positionEvaluation),
-        moveIndex: moveIdx,
+  if (delta != null && delta < scoreDropThreshold) {
+    return true;
+  }
 
-        moveIsForcedMateForPlayer: moveEvaluation?.forced_mate?.for === "PLAYER",
-        moveIsForcedMateForOpponent: moveEvaluation?.forced_mate?.for === "OPPONENT",
-        maintainsForcedMateFor: doesMaintainForcedMateFor(moveEvaluation, positionEvaluation),
-        blundersForcedMateAgainst: doesBlunderForcedMateAgainst(moveEvaluation, positionEvaluation),
-        maintainsForcedMateAgainst: doesMaintainForcedMateAgainst(moveEvaluation, positionEvaluation),
+  return false;
+};
 
-        moveScore: moveEvaluation.score || null,
-        scoreDelta: scoreDelta,
-        isDraw: moveEvaluation.score != null && moveEvaluation.score === 0,
-        maintainsDraw: doesMaintainDraw(moveEvaluation, positionEvaluation),
-    };
-}
+export const makeMoveDescription = (
+  move: Move,
+  moveEvaluation: Evaluation,
+  position: EvaluatedPosition
+): MoveDescription => {
+  const positionEvaluation = position.best_moves[0].evaluation;
+  const moveIdx = findMatchingMoveIdx(position.best_moves, move);
+  const scoreDelta = getMoveScoreDelta(
+    move.color,
+    moveEvaluation,
+    positionEvaluation
+  );
 
-export const makePositionDescription = (position: EvaluatedPosition): PositionDescription => {
+  return {
+    isBestMove: moveIdx === 0,
+    isGoodMove: isGoodMove(
+      move.color,
+      moveEvaluation,
+      positionEvaluation,
+      300,
+      50
+    ),
+    maintainsAdvantage: doesMaintainAdvantage(
+      move.color,
+      moveEvaluation,
+      positionEvaluation
+    ),
+    moveIndex: moveIdx,
 
-    const positionEvaluation = position.best_moves[0].evaluation;
+    moveIsForcedMateForPlayer: moveEvaluation?.forced_mate?.for === "PLAYER",
+    moveIsForcedMateForOpponent:
+      moveEvaluation?.forced_mate?.for === "OPPONENT",
+    maintainsForcedMateFor: doesMaintainForcedMateFor(
+      moveEvaluation,
+      positionEvaluation
+    ),
+    blundersForcedMateAgainst: doesBlunderForcedMateAgainst(
+      moveEvaluation,
+      positionEvaluation
+    ),
+    maintainsForcedMateAgainst: doesMaintainForcedMateAgainst(
+      moveEvaluation,
+      positionEvaluation
+    ),
 
-    var numGoodMoves = 0;
-    var numMateForMoves = 0;
-    var numMovesMaintainAdvantage = 0;
+    moveScore: moveEvaluation.score || null,
+    scoreDelta: scoreDelta,
+    isDraw: moveEvaluation.score != null && moveEvaluation.score === 0,
+    maintainsDraw: doesMaintainDraw(moveEvaluation, positionEvaluation),
+  };
+};
 
-    for (const { move, evaluation } of position.best_moves) {
+export const makePositionDescription = (
+  position: EvaluatedPosition
+): PositionDescription => {
+  const positionEvaluation = position.best_moves[0].evaluation;
 
-        if (isGoodMove(move.color, evaluation, positionEvaluation, 300, 50)) {
-            numGoodMoves += 1;
-        }
+  var numGoodMoves = 0;
+  var numMateForMoves = 0;
+  var numMovesMaintainAdvantage = 0;
 
-        if (evaluation?.forced_mate?.for === "OPPONENT") {
-            numMateForMoves += 1;
-        }
-
-        if (doesMaintainAdvantage(move.color, evaluation, positionEvaluation)) {
-            numMovesMaintainAdvantage += 1;
-        }
+  for (const { move, evaluation } of position.best_moves) {
+    if (isGoodMove(move.color, evaluation, positionEvaluation, 300, 50)) {
+      numGoodMoves += 1;
     }
 
-    return {
-        numGoodMoves, numMateForMoves, numMovesMaintainAdvantage
-    };
-}
+    if (evaluation?.forced_mate?.for === "OPPONENT") {
+      numMateForMoves += 1;
+    }
 
+    if (doesMaintainAdvantage(move.color, evaluation, positionEvaluation)) {
+      numMovesMaintainAdvantage += 1;
+    }
+  }
 
-
-
+  return {
+    numGoodMoves,
+    numMateForMoves,
+    numMovesMaintainAdvantage,
+  };
+};

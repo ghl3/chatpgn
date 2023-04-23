@@ -1,6 +1,6 @@
 import { Evaluation } from "../chess/Evaluation";
 import { Move } from "../chess/Move";
-import { Color } from "../chess/Color";
+import { Color, getOppositeColor } from "../chess/Color";
 import {
   MoveAndEvaluation,
   EvaluatedPosition,
@@ -112,15 +112,11 @@ export class Engine {
     this._log("Engine -- Received Message: " + msg);
 
     if (parsed.type === "INFO") {
-      // Info messages come in two types:
-      // - A Move and Evaluation
-      // - An evaluation
-
       if (this.positions.length === 0) {
         throw new Error("No Positions Found");
       }
 
-      // Get the resolved position
+      // Get the evaluation and next move from the info message
       const fen: Fen = this.positions[0];
       const color = FenUtil.getTurn(fen);
       const moveAndEval = Engine.buildMoveAndEvaluationFromInfo(parsed, color);
@@ -318,8 +314,11 @@ export class Engine {
     } else if (info?.score?.mate !== undefined) {
       const mate_in = Math.abs(info.score.mate);
       const mate_for = info.score.mate > 0 ? "PLAYER" : "OPPONENT";
+
+      const mate_for_color =
+        mate_for === "PLAYER" ? color : getOppositeColor(color);
       return {
-        forced_mate: { in: mate_in, for: mate_for },
+        forced_mate: { in: mate_in, for: mate_for_color },
         depth: info?.depth,
       };
     } else {
