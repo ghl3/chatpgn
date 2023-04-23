@@ -42,11 +42,6 @@ export class EventParser {
       return { type: "READY" };
     }
 
-    const mage = msg.match(/^mage.*/);
-    if (mage) {
-      return EventParser.parseMate(msg);
-    }
-
     const info = msg.match(/^info.*/);
     if (info) {
       return EventParser.parseInfo(msg);
@@ -72,10 +67,6 @@ export class EventParser {
     }
 
     return { type: "UNKNOWN" };
-  };
-
-  static parseMate = (info_log: string): IsMateMessage => {
-    return { type: "ISMATE" };
   };
 
   static parseInfo = (info_log: string): InfoMessage => {

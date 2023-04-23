@@ -248,7 +248,7 @@ export class Engine {
     ).sort(
       makeComparator((x) => [
         // Sort by "mate in x" for the player, where lower x is better.
-        x?.evaluation?.forced_mate?.for === "PLAYER"
+        x?.evaluation?.forced_mate?.for === color
           ? x?.evaluation?.forced_mate?.in
           : Number.MAX_VALUE,
 
@@ -258,7 +258,7 @@ export class Engine {
 
         // Sort by "mate in x" for opponent, where higher x is better.
         // We include the -1 to reverse the sort so higher numbers come first.
-        x?.evaluation?.forced_mate?.for === "OPPONENT"
+        x?.evaluation?.forced_mate?.for === getOppositeColor(color)
           ? -1 * x?.evaluation?.forced_mate?.in
           : Number.MAX_VALUE,
       ])
