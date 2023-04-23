@@ -1,22 +1,12 @@
-// Format: 'yyyy-MM-dd'
-
-import { YearMonth } from "../utils/YearMonth";
+import { Move } from "./Move";
 import { Position } from "./Position";
-
-// TODO: Add type checking here
-export type YearMonthDay = string;
 
 export interface Game {
   id: string;
   white: string;
   black: string;
-  date: YearMonthDay;
+  moves: Move[];
+  // positions[0] is the starting position.
+  // positions[i] is the position after the ith move.
   positions: Position[];
-}
-
-export class GameUtil {
-  // Returns a string representing the year/month
-  static yearMonthString = (game: Game): YearMonth => {
-    return game.date.split("-").slice(0, 2).join("-");
-  };
 }

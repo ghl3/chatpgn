@@ -1,7 +1,6 @@
 import { Move } from "./Move";
 import { Evaluation } from "./Evaluation";
-import { Fen } from "./Fen";
-import { Color } from "./Color";
+import { Position } from "./Position";
 
 export interface MoveAndEvaluation {
   move: Move;
@@ -9,8 +8,7 @@ export interface MoveAndEvaluation {
 }
 
 export interface EvaluatedPosition {
-  fen: Fen;
-  color: Color;
+  position: Position;
   evaluation: Evaluation;
   best_moves: MoveAndEvaluation[];
 }

@@ -2,9 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import ChessWebAPI from "chess-web-api";
 import { Game } from "@/chess/Game";
-import { MoveIndex } from "@/chess/MoveIndex";
 import { GameState, Position } from "@/chess/Position";
 import { Chess } from "chess.js";
+import { Move } from "@/chess/Move";
+import { Color } from "@/chess/Color";
 
 const operaGamePgn: string = `[Event "Casual Game"]
 [Site "Le Café de la Régence, Paris FRA"]
@@ -87,30 +88,33 @@ const getGameState = (game: Chess): GameState => {
   }
 };
 
+interface MoveIndex {
+  turn: Color;
+  moveNumber: number;
+}
+
 // Parse a fetched Chess.com PGN, including metadata
 export const parseGame = (game: ChessComGameData): Game => {
   const parsed_game = new Chess();
   parsed_game.loadPgn(game.game.pgn);
 
   const positions: Position[] = [];
+  const moves: Move[] = [];
 
   // Create a new game and walk through the moves of the
   // previously parsed game to generate the per-move fen
   const incremental_game = new Chess();
 
-  // Note that this is extremely expensive for when we have
-  // to download many games.
-
   var moveIndex: MoveIndex = { turn: "w", moveNumber: 1 };
   for (let move of parsed_game.history()) {
     positions.push({
-      moveIndex: { ...moveIndex },
+      color: moveIndex.turn,
       fen: incremental_game.fen(),
-      gameState: getGameState(incremental_game),
     });
 
     // Update the position
-    incremental_game.move(move);
+    const parsedMove = incremental_game.move(move);
+    moves.push(parsedMove);
 
     if (moveIndex.turn === "w") {
       moveIndex.turn = "b";
@@ -119,11 +123,12 @@ export const parseGame = (game: ChessComGameData): Game => {
       moveIndex.moveNumber += 1;
     }
   }
+
   // Capture the final position
+  // There should be 1 more position than move
   positions.push({
-    moveIndex: { ...moveIndex },
+    color: moveIndex.turn,
     fen: incremental_game.fen(),
-    gameState: getGameState(incremental_game),
   });
 
   const white =
@@ -135,8 +140,8 @@ export const parseGame = (game: ChessComGameData): Game => {
     id: game.game.id.toString(),
     white: white.username,
     black: black.username,
-    date: parsed_game.header().Date.replaceAll(".", "-"),
     positions: positions,
+    moves: moves,
   };
 };
 

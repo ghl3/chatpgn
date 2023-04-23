@@ -347,8 +347,10 @@ export class Engine {
     }
 
     return {
-      fen,
-      color,
+      position: {
+        fen: fen,
+        color: color,
+      },
       evaluation: evaluation || bestMoves[0].evaluation,
       best_moves: bestMovesDecorated,
     };

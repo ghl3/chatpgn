@@ -13,7 +13,7 @@ import { useChessboard } from "@/hooks/UseChessboard";
 import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
 import { Engine } from "@/engine/Engine";
 import { evaluateGame } from "@/utils/Evaluation";
-import { EvaluatedPosition } from "@/chess/EvaluatedPosition";
+import { EvaluatedGame } from "@/chess/EvaluatedGame";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -36,9 +36,9 @@ const Review = () => {
   const [currentMoveDescription, setCurrentMoveDescription] = useState<
     string | null
   >(null);
-  const [evaluatedPositions, setEvaluatedPositions] = useState<
-    EvaluatedPosition[] | null
-  >(null);
+  const [evaluatedGame, setEvaluatedGame] = useState<EvaluatedGame | null>(
+    null
+  );
 
   const setDescriptionFromIndex = (positionIndex: number) => {
     if (positionIndex == 0) {
@@ -55,8 +55,8 @@ const Review = () => {
   const setGamePosition = (moveIndex: number) => {
     chessboardData.setPositionFromIndex(moveIndex);
     setDescriptionFromIndex(moveIndex);
-    if (evaluatedPositions) {
-      console.log(evaluatedPositions[moveIndex]);
+    if (evaluatedGame) {
+      console.log(evaluatedGame.evaluatedPositions[moveIndex]);
     }
   };
 
@@ -100,7 +100,7 @@ const Review = () => {
     setIsLoading(true);
     setLoadingMessage("Fetching game...");
     chessboardData.clearGame();
-    setEvaluatedPositions(null);
+    setEvaluatedGame(null);
 
     try {
       const gameResponse = await axios.post("/api/fetchGame", {
@@ -112,14 +112,13 @@ const Review = () => {
       chessboardData.loadGame(game);
 
       setLoadingMessage("Evaluating game...");
-
-      const evaluatedPositions = await evaluateGame(game, engine);
-      setEvaluatedPositions(evaluatedPositions);
+      const evaluatedGame: EvaluatedGame = await evaluateGame(game, engine);
+      setEvaluatedGame(evaluatedGame);
 
       setLoadingMessage("Annotating game...");
       // TODO: Send a parsed and evaluated game pgn
       const reviewResponse = await axios.post("/api/reviewGame", {
-        pgn: chessComGame.game.pgn,
+        evaluatedGame: evaluatedGame,
         debug: true,
       });
       const { reviewedGame } = reviewResponse.data;

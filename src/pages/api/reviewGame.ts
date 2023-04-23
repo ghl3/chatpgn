@@ -6,6 +6,10 @@ import {
   exampleResponse,
   systemPrompt,
 } from "@/utils/gameReviewPrompts";
+import { EvaluatedGame } from "@/chess/EvaluatedGame";
+import { EvaluatedPosition } from "@/chess/EvaluatedPosition";
+import { Move } from "@/chess/Move";
+import { EvaluationUtil } from "@/chess/Evaluation";
 
 const operaGameText: string = `1. e4 {White opens with the king's pawn, claiming the center} e5 {Black responds symmetrically, establishing a classical pawn structure}
 2. Nf3 {White develops the knight, attacking the e5 pawn} d6 {Black defends the e5 pawn with a pawn, entering the Philidor's Defense}
@@ -113,6 +117,56 @@ export const getMoveDescriptions = (
   return moveDescriptions;
 };
 
+const makeMoveComment = (
+  move: Move,
+  startingPositionEvaluation: EvaluatedPosition,
+  endingPositionEvaluation: EvaluatedPosition
+): string => {
+  const startingEvalString = EvaluationUtil.toEvalString(
+    startingPositionEvaluation.evaluation
+  );
+  const endingEvalString = EvaluationUtil.toEvalString(
+    endingPositionEvaluation.evaluation
+  );
+
+  const bestMoveDescriptions = [];
+  for (const move of startingPositionEvaluation.best_moves) {
+    const moveDesiption = `${move.move.san} (${EvaluationUtil.toEvalString(
+      move.evaluation
+    )})`;
+    bestMoveDescriptions.push(moveDesiption);
+  }
+
+  const bestMoveDescription = bestMoveDescriptions.join(", ");
+
+  return `eval before: ${startingEvalString},
+  best moves: ${bestMoveDescription},
+  eval after: ${endingEvalString}`;
+};
+
+const createEvaluatedPgn = (evaluatedGame: EvaluatedGame): string => {
+  const pgnLines: string[] = [];
+  //let gameMove: number = 1;
+  for (const [index, move] of evaluatedGame.moves.entries()) {
+    const color = index % 2 === 0 ? "w" : "b";
+    const gameMoveNumber = Math.floor(index / 2) + 1;
+    const startingPositionEvaluation = evaluatedGame.evaluatedPositions[index];
+    const endingPositionEvaluation =
+      evaluatedGame.evaluatedPositions[index + 1];
+    const prefix = color == "w" ? `${gameMoveNumber}.` : "";
+    const suffix = color == "b" ? "\n" : "";
+    const comment = makeMoveComment(
+      move,
+      startingPositionEvaluation,
+      endingPositionEvaluation
+    )
+      .replace(/\n/g, " ")
+      .replace(/\s+/g, " ");
+    pgnLines.push(`${prefix} ${move.san} {${comment}}${suffix}`);
+  }
+  return pgnLines.join(" ");
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -122,12 +176,15 @@ export default async function handler(
     return;
   }
 
-  const { pgn, debug } = req.body;
+  const { evaluatedGame, debug } = req.body;
+
+  const pgn: string = createEvaluatedPgn(evaluatedGame);
 
   if (debug) {
     const response = operaGameText;
     const reviewedGame = parseGameText(response);
     res.status(200).json({ response, reviewedGame });
+    return;
   }
 
   try {
