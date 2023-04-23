@@ -12,6 +12,8 @@ import styles from "../styles/Review.module.css";
 import { useChessboard } from "@/hooks/UseChessboard";
 import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
 import { Engine } from "@/engine/Engine";
+import { evaluateGame } from "@/utils/Evaluation";
+import { EvaluatedPosition } from "@/chess/EvaluatedPosition";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -34,25 +36,9 @@ const Review = () => {
   const [currentMoveDescription, setCurrentMoveDescription] = useState<
     string | null
   >(null);
-
-  const evaluateGame = async (game: Game) => {
-    if (!engine) {
-      return;
-    }
-
-    for (const position of game.positions) {
-      const fen = position.fen;
-      const result = await engine.evaluatePosition(fen);
-      console.log(
-        "FEN:",
-        fen,
-        "Score:",
-        result.evaluation,
-        "Move:",
-        result.best_moves.length > 0 ? result.best_moves[0] : "None"
-      );
-    }
-  };
+  const [evaluatedPositions, setEvaluatedPositions] = useState<
+    EvaluatedPosition[] | null
+  >(null);
 
   const setDescriptionFromIndex = (positionIndex: number) => {
     if (positionIndex == 0) {
@@ -69,6 +55,9 @@ const Review = () => {
   const setGamePosition = (moveIndex: number) => {
     chessboardData.setPositionFromIndex(moveIndex);
     setDescriptionFromIndex(moveIndex);
+    if (evaluatedPositions) {
+      console.log(evaluatedPositions[moveIndex]);
+    }
   };
 
   const handleLeftClick = () => {
@@ -105,9 +94,13 @@ const Review = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (engine == null) {
+      throw new Error("Engine is null");
+    }
     setIsLoading(true);
     setLoadingMessage("Fetching game...");
     chessboardData.clearGame();
+    setEvaluatedPositions(null);
 
     try {
       const gameResponse = await axios.post("/api/fetchGame", {
@@ -120,7 +113,8 @@ const Review = () => {
 
       setLoadingMessage("Evaluating game...");
 
-      const evauatedGame = await evaluateGame(game);
+      const evaluatedPositions = await evaluateGame(game, engine);
+      setEvaluatedPositions(evaluatedPositions);
 
       setLoadingMessage("Annotating game...");
       // TODO: Send a parsed and evaluated game pgn
