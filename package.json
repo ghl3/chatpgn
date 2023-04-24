@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "npx prettier --write '**/*.{js,jsx,ts,tsx,css,json}'",
+    "format": "npx prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}'",
     "test": "jest"
   },
   "dependencies": {
