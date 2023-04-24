@@ -40,50 +40,46 @@ export const OPERA_PGN: string = `[Event "Casual Game"]
 [BlackElo "?"]
 [PlyCount "46"]
 
-1.e4 e5
-2.Nf3 d6
-3.d4 Bg4
-4.dxe5 Bxf3
-5.Qxf3 dxe5
-6.Bc4 Nf6
-7.Qb3 Qe7
-8.Nc3 c6
-9.Bg5 b5
-10.Nxb5 cxb5
-11.Bxb5+ Nbd7
-12.O-O-O Rd8
-13.Rxd7 Rxd7
-14.Rd1 Qe6
-15.Bxd7+ Nxd7
-16.Qb8+ Nxb8
-17.Rd8# 0-1
+1. e4 {eval before: +0.53, best moves: e4 (+0.53), eval after: +0.07}  e5 {eval before: +0.07, best moves: e6 (+0.07), eval after: +0.95}
+2. Nf3 {eval before: +0.95, best moves: Nf3 (+0.95), eval after: +0.09}  d6 {eval before: +0.09, best moves: d6 (+0.09), eval after: +0.59}
+3. d4 {eval before: +0.59, best moves: d4 (+0.59), eval after: +0.29}  Bg4 {eval before: +0.29, best moves: exd4 (+0.29), eval after: +1.21}
+4. dxe5 {eval before: +1.21, best moves: dxe5 (+1.21), c3 (+1.14), eval after: +0.78}  Bxf3 {eval before: +0.78, best moves: Nd7 (+0.78), eval after: +1.66}
+5. Qxf3 {eval before: +1.66, best moves: Qxf3 (+1.66), eval after: +1.13}  dxe5 {eval before: +1.13, best moves: dxe5 (+1.13), eval after: +1.57}
+6. Bc4 {eval before: +1.57, best moves: Bc4 (+1.57), eval after: +0.73}  Nf6 {eval before: +0.73, best moves: Qf6 (+0.73), eval after: +1.95}
+7. Qb3 {eval before: +1.95, best moves: Qb3 (+1.95), eval after: +1.63}  Qe7 {eval before: +1.63, best moves: Qe7 (+1.63), eval after: +1.93}
+8. Nc3 {eval before: +1.93, best moves: Qxb7 (+1.93), eval after: +1.37}  c6 {eval before: +1.37, best moves: c6 (+1.37), eval after: +1.98}
+9. Bg5 {eval before: +1.98, best moves: Bg5 (+1.98), eval after: +1.58}  b5 {eval before: +1.58, best moves: Na6 (+1.58), eval after: +2.89}
+10. Nxb5 {eval before: +2.89, best moves: Nxb5 (+2.89), eval after: +2.6}  cxb5 {eval before: +2.6, best moves: Qb4+ (+2.6), eval after: +7.47}
+11. Bxb5+ {eval before: +7.47, best moves: Bxb5+ (+7.47), eval after: +7.32}  Nbd7 {eval before: +7.32, best moves: Nbd7 (+7.32), eval after: +7.78}
+12. O-O-O {eval before: +7.78, best moves: O-O-O (+7.78), eval after: +7.34}  Rd8 {eval before: +7.34, best moves: Qc5 (+7.34), eval after: +9.14}
+13. Rxd7 {eval before: +9.14, best moves: Rxd7 (+9.14), eval after: +9.06}  Rxd7 {eval before: +9.06, best moves: Nxd7 (+9.06), eval after: +9.74}
+14. Rd1 {eval before: +9.74, best moves: Rd1 (+9.74), eval after: +9.37}  Qe6 {eval before: +9.37, best moves: Qb4 (+9.37), eval after: +14.36}
+15. Bxd7+ {eval before: +14.36, best moves: Bxd7+ (+14.36), eval after: +14.29}  Nxd7 {eval before: +14.29, best moves: Qxd7 (+14.29), eval after: Mate in 2 for w}
+16. Qb8+ {eval before: Mate in 2 for w, best moves: Qb8+ (Mate in 2 for w), eval after: Mate in 1 for w}  Nxb8 {eval before: Mate in 1 for w, best moves: Nxb8 (Mate in 1 for w), eval after: Mate in 1 for w}
+17. Rd8# {eval before: Mate in 1 for w, best moves: Rd8# (Mate in 1 for w), eval after: Mate in 0 for w}
 `;
 
-export const OPERA_RESPONSE: string = `1. e4 Paul Morphy plays e4, opening with a King's Pawn Opening.
-2. e5 Duke Karl / Count Isouard responds symmetrically with e5.
-3. Nf3 Morphy attacks the pawn on e5, playing the classic move in the Two Knights Defense.
-4. d6 Black develops a pawn to protect the e5 pawn and attack the center.
-5. dxe5 Morphy captures the pawn on e5 with the knight.
-6. Bg4 Black moves the bishop to g4 to pin the knight and threaten the queen.
-7. dxe5 Morphy captures back the bishop on g4 with the queen.
-8. Bxf3+ Black captures the bishop on f3 with the pawn, destroying Morphy's pawn structure.
-9. Qxf3 Morphy develops his queen, attacking the pawn on f7.
-10. dxc6 Black plays c6, defending the pawn on d6 and attacking the knight on b5.
-11. Bxb5+ Morphy sacrifices his bishop to create a discovered check and attack the king.
-12. Nbd7 Black develops his knight and blocks the check.
-13. Rxd7 Morphy sacrifices his rook to continue the attack.
-14. Qe6+ Black's king moves to e6 to avoid the check.
-15. Bxd7+ Morphy captures the knight with the bishop, creating a double attack on the king and rook.
-16. Qb8+ Morphy moves his queen to b8, creating a discovered check and attacking the king.
-17. Nxb8 Black captures the queen with the knight.
-18. Nc6+ Black checks the king with the knight.
-19. Rd8# Morphy delivers a mate with his rook.
+export const OPERA_RESPONSE: string = `1. e4 {White opens with the king's pawn, aiming to control the center} e5 {Black responds symmetrically, contesting the center}
+2. Nf3 {White develops the knight, attacking the e5 pawn} d6 {Black defends the pawn by advancing the d-pawn}
+3. d4 {White breaks the pawn chain, challenging the center} Bg4 {Black develops the bishop with a pin on the knight}
+4. dxe5 {White captures the pawn, taking advantage of the center} Bxf3 {Black captures the knight, removing a key defender}
+5. Qxf3 {White recaptures with the queen, maintaining central pressure} dxe5 {Black recaptures the pawn, opening lines for development}
+6. Bc4 {White develops the bishop, targeting the f7 weakness} Nf6 {Black develops the knight, attacking the e4 pawn}
+7. Qb3 {White moves the queen, putting pressure on the f7 square} Qe7 {Black defends f7 with the queen, connecting the rooks}
+8. Nc3 {White develops the knight, supporting the e4 pawn} c6 {Black prepares to challenge the strong bishop on c4}
+9. Bg5 {White pins the f6 knight, creating threats} b5 {Black tries to kick the bishop, but weakens the queenside}
+10. Nxb5 {White captures the pawn, exploiting Black's weak move} cxb5 {Black recaptures, but overlooks a tactic}
+11. Bxb5+ {White checks with the bishop, winning material} Nbd7 {Black blocks the check, but is now losing}
+12. O-O-O {White castles queenside, centralizing the rook} Rd8 {Black tries to challenge the d-file, but it's too late}
+13. Rxd7 {White captures the knight, increasing the material advantage} Rxd7 {Black recaptures, hoping for some counterplay}
+14. Rd1 {White doubles rooks on the d-file, increasing pressure} Qe6 {Black tries to defend, but the position is lost}
+15. Bxd7+ {White captures the rook, delivering check} Nxd7 {Black recaptures, but is now facing mate}
+16. Qb8+ {White checks the king, forcing the knight to move} Nxb8 {Black moves the knight, but it's futile}
+17. Rd8# {White delivers checkmate, ending the game}
 
-Overall, this game is a brilliant example of Paul Morphy's attacking style.
-He sacrifices material to create threats against the enemy king and keeps the pressure
-on throughout the game. Morphy's use of discovered checks and double attacks is particularly impressive.
-Black's defense is generally good, but in the end, Morphy's relentless attacks prove to be too much.
-This game is a great example of how to play an aggressive attacking game.`;
+This game featured a sharp battle for the center in the opening.
+White played aggressively, exploiting Black's mistakes to gain a decisive advantage.
+Black's errors in the middlegame allowed White to win material and eventually deliver checkmate.`;
 
 export const generatePromptMessages = (
   pgn: string

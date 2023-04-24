@@ -57,9 +57,6 @@ const Review = () => {
   const setGamePosition = (moveIndex: number) => {
     chessboardData.setPositionFromIndex(moveIndex);
     setDescriptionFromIndex(moveIndex);
-    if (evaluatedGame) {
-      console.log(evaluatedGame.evaluatedPositions[moveIndex]);
-    }
   };
 
   const handleLeftClick = () => {
