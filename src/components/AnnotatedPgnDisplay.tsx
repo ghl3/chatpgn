@@ -1,5 +1,5 @@
 import React from "react";
-import { pgnToString } from "../utils/pgnToString";
+import { pgnToString } from "../annotate/pgnToString";
 import styles from "../styles/AnnotatedPgnDisplay.module.css";
 import { ParseTree } from "@mliebelt/pgn-parser";
 

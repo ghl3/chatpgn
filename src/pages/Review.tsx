@@ -1,7 +1,6 @@
 // pages/review.tsx
 
 import React, { useState, FormEvent } from "react";
-import classNames from "classnames";
 
 import Head from "next/head";
 import axios from "axios";
@@ -10,13 +9,13 @@ import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
 import styles from "../styles/Review.module.css";
 import { useChessboard } from "@/hooks/UseChessboard";
-import { MoveDescription, getMoveDescriptions } from "./api/reviewGame";
 import { Engine } from "@/engine/Engine";
-import { evaluateGame } from "@/utils/Evaluation";
+import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameIdForm from "@/components/GameIdForm";
 import ControlButtons from "@/components/ControlButtons";
 import PositionDescription from "@/components/PositionDescription";
+import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -186,7 +185,9 @@ const Review = () => {
               <div className="row">
                 <PositionDescription
                   evaluatedPosition={
-                    evaluatedGame?.evaluatedPositions[chessboardData.moveIndex]
+                    evaluatedGame?.evaluatedPositions[
+                      chessboardData.moveIndex
+                    ] || null
                   }
                   description={currentMoveDescription}
                 />

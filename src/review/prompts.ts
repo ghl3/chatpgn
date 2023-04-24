@@ -1,6 +1,6 @@
-import { Persona } from "./persona";
+import { Persona } from "../annotate/persona";
 
-const SYSTEM_PROMPT: string = `You are a Chess PGN game reviewer.
+export const SYSTEM_PROMPT: string = `You are a Chess PGN game reviewer.
 I'm going to give you a PGN.  I want you to do a move-by-move description and review of the game.
 The comments should be aimed at a high level, so they should be advanced and instructive.
 The PGN will contain comments, and the comments will contain position and move evaluations.
@@ -27,7 +27,7 @@ This was a Ruy Lopez game.  White played a very good game, and black played a ve
 Output nothing other than the format described above.  Do not have any other response or acknowledgement.
 `;
 
-const EXAMPLE_QUERY_1: string = `[Event "Casual Game"]
+export const OPERA_PGN: string = `[Event "Casual Game"]
 [Site "Le Café de la Régence, Paris FRA"]
 [Date "1858.??.??"]
 [EventDate "?"]
@@ -59,7 +59,7 @@ const EXAMPLE_QUERY_1: string = `[Event "Casual Game"]
 17.Rd8# 0-1
 `;
 
-const EXAMPLE_RESPONSE_1: string = `1. e4 Paul Morphy plays e4, opening with a King's Pawn Opening.
+export const OPERA_RESPONSE: string = `1. e4 Paul Morphy plays e4, opening with a King's Pawn Opening.
 2. e5 Duke Karl / Count Isouard responds symmetrically with e5.
 3. Nf3 Morphy attacks the pawn on e5, playing the classic move in the Two Knights Defense.
 4. d6 Black develops a pawn to protect the e5 pawn and attack the center.
@@ -85,14 +85,13 @@ on throughout the game. Morphy's use of discovered checks and double attacks is 
 Black's defense is generally good, but in the end, Morphy's relentless attacks prove to be too much.
 This game is a great example of how to play an aggressive attacking game.`;
 
-export const systemPrompt = (): string => {
-  return SYSTEM_PROMPT;
-};
-
-export const exampleQuery = (): string => {
-  return EXAMPLE_QUERY_1;
-};
-
-export const exampleResponse = (): string => {
-  return EXAMPLE_RESPONSE_1;
+export const generatePromptMessages = (
+  pgn: string
+): { role: "system" | "user" | "assistant"; content: string }[] => {
+  return [
+    { role: "system", content: SYSTEM_PROMPT },
+    { role: "user", content: OPERA_PGN },
+    { role: "assistant", content: OPERA_RESPONSE },
+    { role: "user", content: pgn },
+  ];
 };

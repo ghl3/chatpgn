@@ -17,7 +17,7 @@ const PositionDescription: React.FC<PositionDescriptionProps> = ({
     <div className={styles.descriptionContainer}>
       <p
         className={classNames(styles.descriptionText, {
-          [styles.hidden]: !description,
+          [styles.hidden]: !evaluatedPosition?.evaluation,
         })}
       >
         {evaluatedPosition &&

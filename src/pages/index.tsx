@@ -6,10 +6,28 @@ import AnnotatedPgnDisplay from "../components/AnnotatedPgnDisplay";
 import styles from "../styles/Home.module.css";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { ParseTree, parseGame } from "@mliebelt/pgn-parser";
-import { annotatePgn } from "../utils/annotatePgn";
-import { Persona } from "../utils/persona";
+import { Persona } from "../annotate/persona";
 import Image from "next/image";
 import Header from "../components/Header"; // Import Header component
+import axios, { AxiosError } from "axios";
+
+export const annotatePgn = async (
+  input: ParseTree,
+  persona: Persona
+): Promise<ParseTree> => {
+  try {
+    const response = await axios.post("/api/annotatePgn", {
+      pgn: input,
+      persona: persona,
+    });
+    return response.data.pgn;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log(error.response?.data.error);
+    }
+    throw new Error("Failed to annotate pgn");
+  }
+};
 
 export default function Home() {
   const [pgnText, setPgnText] = useState("");

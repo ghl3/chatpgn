@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import styles from "../styles/PersonaSelector.module.css";
-import { Persona } from "../utils/persona";
+import { Persona } from "../annotate/persona";
 
 interface PersonaSelectorProps {
   persona: Persona;

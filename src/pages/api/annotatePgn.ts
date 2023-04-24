@@ -1,9 +1,9 @@
 // pages/api/annotatedPgn.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { Persona } from "../../utils/persona";
+import { Persona } from "../../annotate/persona";
 import { Configuration, OpenAIApi } from "openai";
-import { systemPrompt } from "@/utils/pgnPrompts";
-import { pgnToString } from "@/utils/pgnToString";
+import { systemPrompt } from "@/annotate/prompts";
+import { pgnToString } from "@/annotate/pgnToString";
 import { parseGame, ParseTree } from "@mliebelt/pgn-parser";
 
 const configuration = new Configuration({

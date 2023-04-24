@@ -35,7 +35,7 @@ export const useChessboard = () => {
 
   const getBoardOrientation = (): "white" | "black" => {
     if (position) {
-      return position.moveIndex.turn === "w" ? "white" : "black";
+      return position.color === "w" ? "white" : "black";
     } else {
       return "white";
     }
