@@ -14,7 +14,17 @@ export interface ReviewedGame {
   overallDescription: string;
 }
 
-const parseMoveDescription = (
+const normalizeWhitespace = (input: string): string => {
+  return input
+    .trim() // Remove beginning and trailing whitespace
+    .replace(/\s+/g, " "); // Replace newlines and multiple whitespaces with a single space
+};
+
+const concatenateNormalizedStrings = (strings: string[]): string => {
+  return normalizeWhitespace(strings.join(" "));
+};
+
+export const parseMoveDescription = (
   moveWithDescription: string,
   color: "white" | "black"
 ): MoveDescription => {
@@ -26,7 +36,7 @@ const parseMoveDescription = (
     return {
       color,
       move,
-      description: description.trim(),
+      description: normalizeWhitespace(description),
     };
   }
 
@@ -57,7 +67,9 @@ export const parseGameText = (gameText: string): ReviewedGame => {
     }
   }
 
-  const overallDescription = overallDescriptionText.join("\n");
+  const overallDescription = concatenateNormalizedStrings(
+    overallDescriptionText
+  );
   return {
     turnDescriptions,
     overallDescription,

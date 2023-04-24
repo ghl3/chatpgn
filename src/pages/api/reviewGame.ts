@@ -2,7 +2,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
 import { OPERA_RESPONSE, generatePromptMessages } from "@/review/prompts";
-import { parseGameText } from "@/review/ReviewedGame";
+import { ReviewedGame, parseGameText } from "@/review/ReviewedGame";
 import { createEvaluatedPgn } from "@/review/PgnUtils";
 
 const configuration = new Configuration({
@@ -25,7 +25,7 @@ export default async function handler(
 
   if (debug) {
     const response = OPERA_RESPONSE;
-    const reviewedGame = parseGameText(response);
+    const reviewedGame: ReviewedGame = parseGameText(response);
     res.status(200).json({ response, reviewedGame });
     return;
   }
