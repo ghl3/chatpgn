@@ -219,23 +219,14 @@ const Review = () => {
               </div>
 
               <div className="row">
-                <button
-                  className="ui basic blue button"
-                  onClick={handleFlipBoard}
-                  disabled={isLoading}
-                >
-                  Flip Board{" "}
-                </button>
-
-                <div className="row">
-                  <GameControlButtons
-                    isLoading={isLoading}
-                    handleJumpToStart={handleJumpToStart}
-                    handleLeftClick={handleLeftClick}
-                    handleRightClick={handleRightClick}
-                    handleJumpToEnd={handleJumpToEnd}
-                  />
-                </div>
+                <GameControlButtons
+                  isLoading={isLoading}
+                  handleJumpToStart={handleJumpToStart}
+                  handleLeftClick={handleLeftClick}
+                  handleRightClick={handleRightClick}
+                  handleJumpToEnd={handleJumpToEnd}
+                  handleFlipBoard={handleFlipBoard}
+                />
               </div>
 
               <div className="row">

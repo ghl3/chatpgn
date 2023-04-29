@@ -9,6 +9,7 @@ interface GameControlButtonsProps {
   handleLeftClick: () => void;
   handleRightClick: () => void;
   handleJumpToEnd: () => void;
+  handleFlipBoard: () => void;
 }
 
 const GameControlButtons: React.FC<GameControlButtonsProps> = ({
@@ -17,6 +18,7 @@ const GameControlButtons: React.FC<GameControlButtonsProps> = ({
   handleLeftClick,
   handleRightClick,
   handleJumpToEnd,
+  handleFlipBoard,
 }) => (
   <div className="ui center aligned basic segment">
     <button
@@ -46,6 +48,13 @@ const GameControlButtons: React.FC<GameControlButtonsProps> = ({
       disabled={isLoading}
     >
       &raquo;
+    </button>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleFlipBoard}
+      disabled={isLoading}
+    >
+      Flip Board
     </button>
   </div>
 );
