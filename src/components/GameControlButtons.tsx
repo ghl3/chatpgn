@@ -1,9 +1,9 @@
-// components/ControlButtons.tsx
+// components/GameControlButtons.tsx
 
 import React from "react";
 import styles from "../styles/Review.module.css";
 
-interface ControlButtonsProps {
+interface GameControlButtonsProps {
   isLoading: boolean;
   handleJumpToStart: () => void;
   handleLeftClick: () => void;
@@ -11,7 +11,7 @@ interface ControlButtonsProps {
   handleJumpToEnd: () => void;
 }
 
-const ControlButtons: React.FC<ControlButtonsProps> = ({
+const GameControlButtons: React.FC<GameControlButtonsProps> = ({
   isLoading,
   handleJumpToStart,
   handleLeftClick,
@@ -50,4 +50,4 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   </div>
 );
 
-export default ControlButtons;
+export default GameControlButtons;

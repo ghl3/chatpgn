@@ -1,6 +1,4 @@
-// pages/review.tsx
-
-import React, { useState, FormEvent } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 
 import Head from "next/head";
 import axios from "axios";
@@ -13,7 +11,7 @@ import { Engine } from "@/engine/Engine";
 import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameInputForm from "@/components/GameInputForm";
-import ControlButtons from "@/components/ControlButtons";
+import GameControlButtons from "@/components/GameControlButtons";
 import PositionDescription from "@/components/PositionDescription";
 import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
 import { useRouter } from "next/router";
@@ -63,31 +61,37 @@ const Review = () => {
     null
   );
 
-  const setDescriptionFromIndex = (positionIndex: number) => {
-    if (positionIndex == 0) {
-      setCurrentMoveDescription(overallDescription);
-    } else if (moveDescriptions) {
-      setCurrentMoveDescription(
-        moveDescriptions[positionIndex - 1].description
-      );
-    } else {
-      setCurrentMoveDescription(null);
-    }
-  };
+  const setDescriptionFromIndex = useCallback(
+    (positionIndex: number) => {
+      if (positionIndex == 0) {
+        setCurrentMoveDescription(overallDescription);
+      } else if (moveDescriptions) {
+        setCurrentMoveDescription(
+          moveDescriptions[positionIndex - 1].description
+        );
+      } else {
+        setCurrentMoveDescription(null);
+      }
+    },
+    [overallDescription, moveDescriptions]
+  );
 
-  const setGamePosition = (moveIndex: number) => {
-    chessboardData.setPositionFromIndex(moveIndex);
-    setDescriptionFromIndex(moveIndex);
-  };
+  const setGamePosition = useCallback(
+    (moveIndex: number) => {
+      chessboardData.setPositionFromIndex(moveIndex);
+      setDescriptionFromIndex(moveIndex);
+    },
+    [chessboardData, setDescriptionFromIndex]
+  );
 
-  const handleLeftClick = () => {
+  const handleLeftClick = useCallback(() => {
     if (chessboardData.moveIndex <= 0) {
       return;
     }
     setGamePosition(chessboardData.moveIndex - 1);
-  };
+  }, [chessboardData.moveIndex, setGamePosition]);
 
-  const handleRightClick = () => {
+  const handleRightClick = useCallback(() => {
     if (
       chessboardData.moveIndex + 1 ==
       chessboardData.game?.positions?.length
@@ -95,25 +99,24 @@ const Review = () => {
       return;
     }
     setGamePosition(chessboardData.moveIndex + 1);
-  };
+  }, [chessboardData.moveIndex, chessboardData.game, setGamePosition]);
 
-  const handleJumpToStart = () => {
+  const handleJumpToStart = useCallback(() => {
     if (chessboardData.game) {
       setGamePosition(0);
     }
-  };
+  }, [chessboardData.game, setGamePosition]);
 
-  const handleJumpToEnd = () => {
+  const handleJumpToEnd = useCallback(() => {
     if (chessboardData.game) {
       const endIndex = chessboardData.game.positions.length - 1;
       setGamePosition(endIndex);
     } else {
       setGamePosition(0);
     }
-  };
+  }, [chessboardData.game, setGamePosition]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(async () => {
     if (engine == null) {
       throw new Error("Engine is null");
     }
@@ -129,7 +132,6 @@ const Review = () => {
       });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
-      // TODO: Ensure the player is one of the players in the game
       setOrientation(getOrientation(game, userName));
       chessboardData.loadGame(game);
 
@@ -160,7 +162,16 @@ const Review = () => {
       setIsLoading(false);
       setLoadingMessage("");
     }
-  };
+  }, [
+    engine,
+    gameId,
+    isDebug,
+    userName,
+    chessboardData,
+    setEvaluatedGame,
+    setMoveDescriptions,
+    setOverallDescription,
+  ]);
 
   return (
     <>
@@ -202,7 +213,7 @@ const Review = () => {
               </div>
 
               <div className="row">
-                <ControlButtons
+                <GameControlButtons
                   isLoading={isLoading}
                   handleJumpToStart={handleJumpToStart}
                   handleLeftClick={handleLeftClick}
@@ -212,14 +223,16 @@ const Review = () => {
               </div>
 
               <div className="row">
-                <PositionDescription
-                  evaluatedPosition={
-                    evaluatedGame?.evaluatedPositions[
-                      chessboardData.moveIndex
-                    ] || null
-                  }
-                  description={currentMoveDescription}
-                />
+                {evaluatedGame && (
+                  <PositionDescription
+                    evaluatedPosition={
+                      evaluatedGame?.evaluatedPositions[
+                        chessboardData.moveIndex
+                      ] || null
+                    }
+                    description={currentMoveDescription}
+                  />
+                )}
               </div>
             </div>
           </div>
