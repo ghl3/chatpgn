@@ -84,6 +84,12 @@ const Review = () => {
     [chessboardData, setDescriptionFromIndex]
   );
 
+  const handleFlipBoard = useCallback(() => {
+    setOrientation((prevOrientation) =>
+      prevOrientation === "white" ? "black" : "white"
+    );
+  }, []);
+
   const handleLeftClick = useCallback(() => {
     if (chessboardData.moveIndex <= 0) {
       return;
@@ -213,13 +219,23 @@ const Review = () => {
               </div>
 
               <div className="row">
-                <GameControlButtons
-                  isLoading={isLoading}
-                  handleJumpToStart={handleJumpToStart}
-                  handleLeftClick={handleLeftClick}
-                  handleRightClick={handleRightClick}
-                  handleJumpToEnd={handleJumpToEnd}
-                />
+                <button
+                  className="ui basic blue button"
+                  onClick={handleFlipBoard}
+                  disabled={isLoading}
+                >
+                  Flip Board{" "}
+                </button>
+
+                <div className="row">
+                  <GameControlButtons
+                    isLoading={isLoading}
+                    handleJumpToStart={handleJumpToStart}
+                    handleLeftClick={handleLeftClick}
+                    handleRightClick={handleRightClick}
+                    handleJumpToEnd={handleJumpToEnd}
+                  />
+                </div>
               </div>
 
               <div className="row">
