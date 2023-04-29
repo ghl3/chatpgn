@@ -4,7 +4,7 @@ import React from "react";
 import styles from "../styles/Review.module.css";
 
 interface GameControlButtonsProps {
-  isLoading: boolean;
+  isDisabled: boolean;
   handleJumpToStart: () => void;
   handleLeftClick: () => void;
   handleRightClick: () => void;
@@ -13,7 +13,7 @@ interface GameControlButtonsProps {
 }
 
 const GameControlButtons: React.FC<GameControlButtonsProps> = ({
-  isLoading,
+  isDisabled,
   handleJumpToStart,
   handleLeftClick,
   handleRightClick,
@@ -24,35 +24,35 @@ const GameControlButtons: React.FC<GameControlButtonsProps> = ({
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleJumpToStart}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       &laquo;
     </button>
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleLeftClick}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       &larr;
     </button>
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleRightClick}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       &rarr;
     </button>
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleJumpToEnd}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       &raquo;
     </button>
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleFlipBoard}
-      disabled={isLoading}
+      disabled={isDisabled}
     >
       Flip Board
     </button>

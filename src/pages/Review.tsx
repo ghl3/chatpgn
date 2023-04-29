@@ -15,6 +15,7 @@ import GameControlButtons from "@/components/GameControlButtons";
 import PositionDescription from "@/components/PositionDescription";
 import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
 import { useRouter } from "next/router";
+import useArrowKeys from "@/hooks/useArrowKeys"; // Import the hook
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -105,6 +106,12 @@ const Review = () => {
       setGamePosition(0);
     }
   }, [chessboardData.game, setGamePosition]);
+
+  // Inside your Review component
+  useArrowKeys({
+    onLeftArrow: handleLeftClick,
+    onRightArrow: handleRightClick,
+  });
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -220,7 +227,7 @@ const Review = () => {
 
               <div className="row">
                 <GameControlButtons
-                  isLoading={isLoading}
+                  isDisabled={chessboardData.game == null}
                   handleJumpToStart={handleJumpToStart}
                   handleLeftClick={handleLeftClick}
                   handleRightClick={handleRightClick}

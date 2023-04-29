@@ -29,15 +29,17 @@ const PositionDescription: React.FC<PositionDescriptionProps> = ({
 
     <div style={{ height: "5px", width: "100%" }}></div>
 
-    <div className={styles.descriptionContainer}>
-      <p
-        className={classNames(styles.descriptionText, {
-          [styles.hidden]: !description,
-        })}
-      >
-        {description || " "}
-      </p>
-    </div>
+    {description && description != "" && (
+      <div className={styles.descriptionContainer}>
+        <p
+          className={classNames(styles.descriptionText, {
+            [styles.hidden]: !description,
+          })}
+        >
+          {description || " "}
+        </p>
+      </div>
+    )}
   </>
 );
 
