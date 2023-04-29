@@ -70,7 +70,7 @@ const Review = () => {
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault(); // Add this line to prevent the default form submission behavior
+      e.preventDefault();
       if (engine == null) {
         throw new Error("Engine is null");
       }
