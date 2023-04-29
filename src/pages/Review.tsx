@@ -6,7 +6,7 @@ import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import { Chessboard } from "react-chessboard";
 import styles from "../styles/Review.module.css";
-import { useChessboard } from "@/hooks/UseChessboard";
+//import { useChessboard } from "@/hooks/UseChessboard";
 import { Engine } from "@/engine/Engine";
 import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
@@ -15,7 +15,9 @@ import GameControlButtons from "@/components/GameControlButtons";
 import PositionDescription from "@/components/PositionDescription";
 import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
 import { useRouter } from "next/router";
-import useArrowKeys from "@/hooks/useArrowKeys"; // Import the hook
+import { useChessboard } from "@/hooks/UseChessboard";
+import ChessboardWithControls from "@/components/Chessboard";
+//import useArrowKeys from "@/hooks/useArrowKeys"; // Import the hook
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -27,7 +29,7 @@ const Review = () => {
   const router = useRouter();
   const isDebug = router.query.debug === "true";
 
-  const [orientation, setOrientation] = useState<"white" | "black">("white");
+  //  const [orientation, setOrientation] = useState<"white" | "black">("white");
   const chessboardData = useChessboard();
 
   const [gameId, setGameId] = useState<string>("");
@@ -39,13 +41,38 @@ const Review = () => {
   const [overallDescription, setOverallDescription] = useState<string | null>(
     null
   );
-  const [currentMoveDescription, setCurrentMoveDescription] = useState<
-    string | null
-  >(null);
+  //const [currentMoveDescription, setCurrentMoveDescription] = useState<
+  //  string | null
+  //  >(null);
   const [evaluatedGame, setEvaluatedGame] = useState<EvaluatedGame | null>(
     null
   );
 
+  const getCurrentMoveDescription = () => {
+    if (
+      chessboardData == null ||
+      chessboardData.game == null ||
+      chessboardData.moveIndex == null
+    ) {
+      return null;
+    }
+
+    if (overallDescription == null || moveDescriptions == null) {
+      return null;
+    }
+
+    const moveIndex = chessboardData.moveIndex;
+    if (moveIndex == 0) {
+      return overallDescription;
+    } else if (moveDescriptions) {
+      return moveDescriptions[moveIndex - 1].description;
+    } else {
+      return null;
+    }
+  };
+
+  const currentMoveDescription = getCurrentMoveDescription();
+  /*
   const setDescriptionFromIndex = useCallback(
     (positionIndex: number) => {
       if (positionIndex == 0) {
@@ -60,7 +87,9 @@ const Review = () => {
     },
     [overallDescription, moveDescriptions]
   );
+  */
 
+  /*
   const setGamePosition = useCallback(
     (moveIndex: number) => {
       chessboardData.setPositionFromIndex(moveIndex);
@@ -112,6 +141,7 @@ const Review = () => {
     onLeftArrow: handleLeftClick,
     onRightArrow: handleRightClick,
   });
+  */
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -145,7 +175,7 @@ const Review = () => {
         const { promptMessages, response, reviewedGame } = reviewResponse.data;
         setMoveDescriptions(getMoveDescriptions(reviewedGame));
         setOverallDescription(reviewedGame.overallDescription);
-        setCurrentMoveDescription(reviewedGame.overallDescription);
+        //setCurrentMoveDescription(reviewedGame.overallDescription);
         console.log("Evaluated game:");
         console.log(evaluatedGame);
         console.log("Prompt messages:");
@@ -197,44 +227,7 @@ const Review = () => {
                 />
               </div>
 
-              <div className="row">
-                <p className={styles.playerName}>
-                  {orientation === "white"
-                    ? chessboardData.game?.white
-                    : chessboardData.game?.black}
-                </p>
-              </div>
-
-              <div className="row">
-                <div className={styles.Chessboard}>
-                  <Chessboard
-                    position={chessboardData.getPositionFen()}
-                    customDarkSquareStyle={{ backgroundColor: "#34495e" }}
-                    boardWidth={chessboardData.boardSize}
-                    areArrowsAllowed={true}
-                    boardOrientation={orientation}
-                  />
-                </div>
-              </div>
-
-              <div className="row">
-                <p className={styles.playerName}>
-                  {orientation === "white"
-                    ? chessboardData.game?.black
-                    : chessboardData.game?.white}
-                </p>
-              </div>
-
-              <div className="row">
-                <GameControlButtons
-                  isDisabled={chessboardData.game == null}
-                  handleJumpToStart={handleJumpToStart}
-                  handleLeftClick={handleLeftClick}
-                  handleRightClick={handleRightClick}
-                  handleJumpToEnd={handleJumpToEnd}
-                  handleFlipBoard={handleFlipBoard}
-                />
-              </div>
+              <ChessboardWithControls chessboardData={chessboardData} />
 
               <div className="row">
                 {evaluatedGame && (

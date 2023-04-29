@@ -10,6 +10,7 @@ export const useChessboard = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [moveIndex, setMoveIndex] = useState<number>(0);
   const [position, setPosition] = useState<Position | null>(null);
+  const [orientation, setOrientation] = useState<"white" | "black">("white");
   const [boardSize, setBoardSize] = useState<number>(400);
 
   const loadGame = (game: Game) => {
@@ -88,5 +89,7 @@ export const useChessboard = () => {
     clearGame,
     loadGame,
     setPositionFromIndex,
+    orientation,
+    setOrientation,
   };
 };

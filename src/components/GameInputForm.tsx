@@ -17,7 +17,6 @@ const GameInputForm: React.FC<GameInputFormProps> = ({
   onSubmit,
   isLoading,
   loadingMessage,
-
   gameId,
   setGameId,
 }) => (
