@@ -16,6 +16,14 @@
   margin-bottom: 1rem;
 }
 
+.playerName {
+  min-height: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
 .loadingMessage {
   min-height: 1rem;
   color: #2c3e50;

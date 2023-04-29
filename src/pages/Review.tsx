@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 
 import Head from "next/head";
 import axios from "axios";
@@ -22,28 +22,12 @@ if (typeof window !== "undefined") {
   engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 1, false);
 }
 
-const getOrientation = (
-  game: Game | null,
-  userName: string
-): "white" | "black" => {
-  if (game == null) {
-    return "white";
-  }
-  if (game.white == userName) {
-    return "white";
-  } else {
-    return "black";
-  }
-};
-
 const Review = () => {
   const router = useRouter();
   const isDebug = router.query.debug === "true";
 
   const [orientation, setOrientation] = useState<"white" | "black">("white");
   const chessboardData = useChessboard();
-
-  const [userName, setUserName] = useState<string>("");
 
   const [gameId, setGameId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -122,62 +106,64 @@ const Review = () => {
     }
   }, [chessboardData.game, setGamePosition]);
 
-  const handleSubmit = useCallback(async () => {
-    if (engine == null) {
-      throw new Error("Engine is null");
-    }
-    setIsLoading(true);
-    setLoadingMessage("Fetching game...");
-    chessboardData.clearGame();
-    setEvaluatedGame(null);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault(); // Add this line to prevent the default form submission behavior
+      if (engine == null) {
+        throw new Error("Engine is null");
+      }
+      setIsLoading(true);
+      setLoadingMessage("Fetching game...");
+      chessboardData.clearGame();
+      setEvaluatedGame(null);
 
-    try {
-      const gameResponse = await axios.post("/api/fetchGame", {
-        gameId,
-        debug: isDebug,
-      });
-      const chessComGame: ChessComGameData = gameResponse.data;
-      const game: Game = parseGame(chessComGame);
-      setOrientation(getOrientation(game, userName));
-      chessboardData.loadGame(game);
+      try {
+        const gameResponse = await axios.post("/api/fetchGame", {
+          gameId,
+          debug: isDebug,
+        });
+        const chessComGame: ChessComGameData = gameResponse.data;
+        const game: Game = parseGame(chessComGame);
+        chessboardData.loadGame(game);
 
-      setLoadingMessage("Evaluating game...");
-      const evaluatedGame: EvaluatedGame = await evaluateGame(game, engine);
-      setEvaluatedGame(evaluatedGame);
+        setLoadingMessage("Evaluating game...");
+        const evaluatedGame: EvaluatedGame = await evaluateGame(game, engine);
+        setEvaluatedGame(evaluatedGame);
 
-      setLoadingMessage("Annotating game...");
-      const reviewResponse = await axios.post("/api/reviewGame", {
-        evaluatedGame: evaluatedGame,
-        debug: isDebug,
-      });
-      const { promptMessages, response, reviewedGame } = reviewResponse.data;
-      setMoveDescriptions(getMoveDescriptions(reviewedGame));
-      setOverallDescription(reviewedGame.overallDescription);
-      setCurrentMoveDescription(reviewedGame.overallDescription);
-      console.log("Evaluated game:");
-      console.log(evaluatedGame);
-      console.log("Prompt messages:");
-      console.log(promptMessages);
-      console.log("Response:");
-      console.log(response);
-      console.log("Reviewed game:");
-      console.log(reviewedGame);
-    } catch (error) {
-      console.error("Error fetching the game data:", error);
-    } finally {
-      setIsLoading(false);
-      setLoadingMessage("");
-    }
-  }, [
-    engine,
-    gameId,
-    isDebug,
-    userName,
-    chessboardData,
-    setEvaluatedGame,
-    setMoveDescriptions,
-    setOverallDescription,
-  ]);
+        setLoadingMessage("Annotating game...");
+        const reviewResponse = await axios.post("/api/reviewGame", {
+          evaluatedGame: evaluatedGame,
+          debug: isDebug,
+        });
+        const { promptMessages, response, reviewedGame } = reviewResponse.data;
+        setMoveDescriptions(getMoveDescriptions(reviewedGame));
+        setOverallDescription(reviewedGame.overallDescription);
+        setCurrentMoveDescription(reviewedGame.overallDescription);
+        console.log("Evaluated game:");
+        console.log(evaluatedGame);
+        console.log("Prompt messages:");
+        console.log(promptMessages);
+        console.log("Response:");
+        console.log(response);
+        console.log("Reviewed game:");
+        console.log(reviewedGame);
+      } catch (error) {
+        console.error("Error fetching the game data:", error);
+      } finally {
+        setIsLoading(false);
+        setLoadingMessage("");
+      }
+    },
+    [
+      //engine,
+      gameId,
+      isDebug,
+      chessboardData,
+      setEvaluatedGame,
+      setMoveDescriptions,
+      setOverallDescription,
+    ]
+  );
 
   return (
     <>
@@ -199,11 +185,17 @@ const Review = () => {
                   onSubmit={handleSubmit}
                   isLoading={isLoading}
                   loadingMessage={loadingMessage}
-                  userName={userName}
-                  setUserName={setUserName}
                   gameId={gameId}
                   setGameId={setGameId}
                 />
+              </div>
+
+              <div className="row">
+                <p className={styles.playerName}>
+                  {orientation === "white"
+                    ? chessboardData.game?.white
+                    : chessboardData.game?.black}
+                </p>
               </div>
 
               <div className="row">
@@ -216,6 +208,14 @@ const Review = () => {
                     boardOrientation={orientation}
                   />
                 </div>
+              </div>
+
+              <div className="row">
+                <p className={styles.playerName}>
+                  {orientation === "white"
+                    ? chessboardData.game?.black
+                    : chessboardData.game?.white}
+                </p>
               </div>
 
               <div className="row">

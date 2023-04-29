@@ -55,7 +55,6 @@ export default async function handler(
       //const annotatedPgn = convertToPgn(response);
       // TODO: handle 'continue'
       const reviewedGame = parseGameText(response);
-
       res.status(200).json({
         promptMessages,
         response,

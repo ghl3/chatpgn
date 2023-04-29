@@ -179,8 +179,8 @@ export default async function handler(
     const chessAPI = new ChessWebAPI();
     const response = await chessAPI.getGameByID(gameId);
     const chessComGame: ChessComGameData = response.body;
-    res.status(200).json(chessComGame);
+    return res.status(200).json(chessComGame);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching the game data" });
+    return res.status(500).json({ error: "Error fetching the game data" });
   }
 }

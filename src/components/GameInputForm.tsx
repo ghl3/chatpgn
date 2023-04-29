@@ -8,8 +8,7 @@ interface GameInputFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
   loadingMessage: string;
-  userName: string;
-  setUserName: React.Dispatch<React.SetStateAction<string>>;
+
   gameId: string;
   setGameId: (value: string) => void;
 }
@@ -18,28 +17,13 @@ const GameInputForm: React.FC<GameInputFormProps> = ({
   onSubmit,
   isLoading,
   loadingMessage,
-  userName,
-  setUserName,
+
   gameId,
   setGameId,
 }) => (
   <div className={styles.formContainer}>
     <h1>Enter Chess.com UserName and Game ID</h1>
     <form onSubmit={onSubmit} className={styles.gameIdForm}>
-      <div className={styles.formItem}>
-        <label htmlFor="user-name" className={styles.label}>
-          Username:
-        </label>
-        <input
-          type="text"
-          id="user-name"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          disabled={isLoading}
-          placeholder="Chess.com username"
-          required
-        />
-      </div>
       <div className={styles.formItem}>
         <label htmlFor="game-id" className={styles.label}>
           Game ID:
