@@ -16,6 +16,7 @@ import GameIdForm from "@/components/GameIdForm";
 import ControlButtons from "@/components/ControlButtons";
 import PositionDescription from "@/components/PositionDescription";
 import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
+import { useRouter } from "next/router";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -24,6 +25,9 @@ if (typeof window !== "undefined") {
 }
 
 const Review = () => {
+  const router = useRouter();
+  const isDebug = router.query.debug === "true";
+
   const chessboardData = useChessboard();
 
   const [gameId, setGameId] = useState<string>("");
@@ -104,7 +108,7 @@ const Review = () => {
     try {
       const gameResponse = await axios.post("/api/fetchGame", {
         gameId,
-        debug: true,
+        debug: isDebug,
       });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
@@ -115,15 +119,22 @@ const Review = () => {
       setEvaluatedGame(evaluatedGame);
 
       setLoadingMessage("Annotating game...");
-      // TODO: Send a parsed and evaluated game pgn
       const reviewResponse = await axios.post("/api/reviewGame", {
         evaluatedGame: evaluatedGame,
-        debug: true,
+        debug: isDebug,
       });
-      const { reviewedGame } = reviewResponse.data;
+      const { promptMessages, response, reviewedGame } = reviewResponse.data;
       setMoveDescriptions(getMoveDescriptions(reviewedGame));
       setOverallDescription(reviewedGame.overallDescription);
       setCurrentMoveDescription(reviewedGame.overallDescription);
+      console.log("Evaluated game:");
+      console.log(evaluatedGame);
+      console.log("Prompt messages:");
+      console.log(promptMessages);
+      console.log("Response:");
+      console.log(response);
+      console.log("Reviewed game:");
+      console.log(reviewedGame);
     } catch (error) {
       console.error("Error fetching the game data:", error);
     } finally {

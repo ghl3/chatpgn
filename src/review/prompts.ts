@@ -86,8 +86,8 @@ export const generatePromptMessages = (
 ): { role: "system" | "user" | "assistant"; content: string }[] => {
   return [
     { role: "system", content: SYSTEM_PROMPT },
-    { role: "user", content: OPERA_PGN },
-    { role: "assistant", content: OPERA_RESPONSE },
+    //{ role: "user", content: OPERA_PGN },
+    //{ role: "assistant", content: OPERA_RESPONSE },
     { role: "user", content: pgn },
   ];
 };

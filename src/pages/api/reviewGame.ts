@@ -31,12 +31,13 @@ export default async function handler(
   }
 
   try {
+    const promptMessages = generatePromptMessages(pgn);
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       n: 1,
       max_tokens: 2048,
       temperature: 0.5,
-      messages: generatePromptMessages(pgn),
+      messages: promptMessages,
     });
 
     if (completion.data.choices[0].message?.content === undefined) {
@@ -56,6 +57,7 @@ export default async function handler(
       const reviewedGame = parseGameText(response);
 
       res.status(200).json({
+        promptMessages,
         response,
         reviewedGame,
       });
@@ -68,9 +70,6 @@ export default async function handler(
     }
   } catch (error) {
     console.error("An unknown error occurred:", error);
-    res.status(500).json({
-      error: "An unknown error occurred",
-      details: { errorMessage: (error as Error).message },
-    });
+    res.status(500).json(error);
   }
 }
