@@ -1,18 +1,18 @@
 // components/ChessboardWithControls.tsx
 
 import React, { useCallback, useState } from "react";
-import { Chessboard } from "react-chessboard";
+import { Chessboard as ReactChessboard } from "react-chessboard";
 import GameControlButtons from "./GameControlButtons";
 import styles from "../styles/Review.module.css";
 import useArrowKeys from "@/hooks/UseArrowKeys";
 import { ChessboardState } from "@/hooks/UseChessboardState";
 
-interface ChessboardWithControlsProps {
-  chessboardData: ChessboardState;
+interface ChessboardProps {
+  chessboardState: ChessboardState;
 }
 
-const ChessboardWithControls: React.FC<ChessboardWithControlsProps> = ({
-  chessboardData,
+const Chessboard: React.FC<ChessboardProps> = ({
+  chessboardState: chessboardData,
 }) => {
   const [orientation, setOrientation] = useState<"white" | "black">("white");
 
@@ -80,7 +80,7 @@ const ChessboardWithControls: React.FC<ChessboardWithControlsProps> = ({
       </div>
 
       <div className={styles.Chessboard}>
-        <Chessboard
+        <ReactChessboard
           position={chessboardData.getPositionFen()}
           customDarkSquareStyle={{ backgroundColor: "#34495e" }}
           boardWidth={chessboardData.boardSize}
@@ -109,4 +109,4 @@ const ChessboardWithControls: React.FC<ChessboardWithControlsProps> = ({
   );
 };
 
-export default ChessboardWithControls;
+export default Chessboard;

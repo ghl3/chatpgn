@@ -16,7 +16,7 @@ import {
   ChessboardState,
   useChessboardState,
 } from "@/hooks/UseChessboardState";
-import ChessboardWithControls from "@/components/Chessboard";
+import Chessboard from "@/components/Chessboard";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -150,7 +150,7 @@ const Review = () => {
                 />
               </div>
 
-              <ChessboardWithControls chessboardData={chessboardState} />
+              <Chessboard chessboardState={chessboardState} />
 
               <div className="row">
                 {evaluatedGame && (
