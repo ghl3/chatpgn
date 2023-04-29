@@ -74,8 +74,8 @@ const Chessboard: React.FC<ChessboardProps> = ({
       <div className="row">
         <p className={styles.playerName}>
           {orientation === "white"
-            ? chessboardData.game?.white
-            : chessboardData.game?.black}
+            ? chessboardData.game?.black
+            : chessboardData.game?.white}
         </p>
       </div>
 
@@ -92,8 +92,8 @@ const Chessboard: React.FC<ChessboardProps> = ({
       <div className="row">
         <p className={styles.playerName}>
           {orientation === "white"
-            ? chessboardData.game?.black
-            : chessboardData.game?.white}
+            ? chessboardData.game?.white
+            : chessboardData.game?.black}
         </p>
       </div>
 
