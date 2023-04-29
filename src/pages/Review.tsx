@@ -12,7 +12,7 @@ import { useChessboard } from "@/hooks/UseChessboard";
 import { Engine } from "@/engine/Engine";
 import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
-import GameIdForm from "@/components/GameIdForm";
+import GameInputForm from "@/components/GameInputForm";
 import ControlButtons from "@/components/ControlButtons";
 import PositionDescription from "@/components/PositionDescription";
 import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
@@ -24,11 +24,28 @@ if (typeof window !== "undefined") {
   engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 1, false);
 }
 
+const getOrientation = (
+  game: Game | null,
+  userName: string
+): "white" | "black" => {
+  if (game == null) {
+    return "white";
+  }
+  if (game.white == userName) {
+    return "white";
+  } else {
+    return "black";
+  }
+};
+
 const Review = () => {
   const router = useRouter();
   const isDebug = router.query.debug === "true";
 
+  const [orientation, setOrientation] = useState<"white" | "black">("white");
   const chessboardData = useChessboard();
+
+  const [userName, setUserName] = useState<string>("");
 
   const [gameId, setGameId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -112,6 +129,8 @@ const Review = () => {
       });
       const chessComGame: ChessComGameData = gameResponse.data;
       const game: Game = parseGame(chessComGame);
+      // TODO: Ensure the player is one of the players in the game
+      setOrientation(getOrientation(game, userName));
       chessboardData.loadGame(game);
 
       setLoadingMessage("Evaluating game...");
@@ -159,10 +178,12 @@ const Review = () => {
           <div className="eight wide centered column">
             <div className="ui center aligned one column grid">
               <div className="row">
-                <GameIdForm
+                <GameInputForm
                   onSubmit={handleSubmit}
                   isLoading={isLoading}
                   loadingMessage={loadingMessage}
+                  userName={userName}
+                  setUserName={setUserName}
                   gameId={gameId}
                   setGameId={setGameId}
                 />
@@ -175,7 +196,7 @@ const Review = () => {
                     customDarkSquareStyle={{ backgroundColor: "#34495e" }}
                     boardWidth={chessboardData.boardSize}
                     areArrowsAllowed={true}
-                    boardOrientation={"white"}
+                    boardOrientation={orientation}
                   />
                 </div>
               </div>
