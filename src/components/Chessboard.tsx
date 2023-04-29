@@ -4,18 +4,16 @@ import React, { useCallback, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import GameControlButtons from "./GameControlButtons";
 import styles from "../styles/Review.module.css";
-import { useChessboard } from "@/hooks/UseChessboard";
-import useArrowKeys from "@/hooks/useArrowKeys";
+import useArrowKeys from "@/hooks/UseArrowKeys";
+import { ChessboardState } from "@/hooks/UseChessboardState";
 
 interface ChessboardWithControlsProps {
-  chessboardData: ReturnType<typeof useChessboard>;
+  chessboardData: ChessboardState;
 }
 
 const ChessboardWithControls: React.FC<ChessboardWithControlsProps> = ({
   chessboardData,
 }) => {
-  //const chessboardData = useChessboard();
-
   const [orientation, setOrientation] = useState<"white" | "black">("white");
 
   const controlsDisabled = chessboardData.game == null;
@@ -23,7 +21,6 @@ const ChessboardWithControls: React.FC<ChessboardWithControlsProps> = ({
   const setGamePosition = useCallback(
     (moveIndex: number) => {
       chessboardData.setPositionFromIndex(moveIndex);
-      //setDescriptionFromIndex(moveIndex);
     },
     [chessboardData]
   );
