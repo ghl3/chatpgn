@@ -10,6 +10,18 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+const fetchOpenAiCompletion = async (promptMessages: any[]): Promise<any> => {
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    n: 1,
+    max_tokens: 2048,
+    temperature: 0.5,
+    messages: promptMessages,
+  });
+
+  return completion;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -30,45 +42,36 @@ export default async function handler(
     return;
   }
 
+  const promptMessages = generatePromptMessages(pgn);
+  let completion;
+
   try {
-    const promptMessages = generatePromptMessages(pgn);
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      n: 1,
-      max_tokens: 2048,
-      temperature: 0.5,
-      messages: promptMessages,
+    completion = await fetchOpenAiCompletion(promptMessages);
+  } catch (apiError) {
+    console.error("OpenAI API error:", apiError);
+    res.status(500).json({
+      message: "Error occurred while calling OpenAI API",
+      error: apiError,
     });
+    return;
+  }
 
-    if (completion.data.choices[0].message?.content === undefined) {
-      console.error("Completion response is missing content");
-      res.status(500).json({
-        error: "Completion response is missing content",
-        details: completion.data.choices[0],
-      });
-      return;
-    }
-
-    const response = completion.data.choices[0].message.content;
-
-    try {
-      //const annotatedPgn = convertToPgn(response);
-      // TODO: handle 'continue'
-      const reviewedGame = parseGameText(response);
-      res.status(200).json({
-        promptMessages,
-        response,
-        reviewedGame,
-      });
-    } catch (pgnError) {
-      console.error("PGN conversion error:", pgnError);
-      res.status(500).json({
-        error: "PGN conversion error",
-        details: { response, pgnError },
-      });
-    }
-  } catch (error) {
-    console.error("An unknown error occurred:", error);
-    res.status(500).json(error);
+  const response = completion.data.choices[0].message.content;
+  try {
+    //const annotatedPgn = convertToPgn(response);
+    // TODO: handle 'continue'
+    const reviewedGame = parseGameText(response);
+    res.status(200).json({
+      promptMessages,
+      response,
+      reviewedGame,
+    });
+    return;
+  } catch (pgnError) {
+    console.error("PGN conversion error:", pgnError);
+    res.status(500).json({
+      message: "PGN conversion error",
+      error: pgnError,
+    });
   }
 }

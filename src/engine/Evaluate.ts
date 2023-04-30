@@ -10,6 +10,7 @@ export const evaluateGame = async (
   const evaluatedPositions: EvaluatedPosition[] = [];
   for (const position of game.positions) {
     const evaluatedPosition = await engine.evaluatePosition(position.fen);
+    console.log("Evaluated position", evaluatedPosition);
     evaluatedPositions.push(evaluatedPosition);
   }
   return {
