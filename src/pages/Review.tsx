@@ -43,7 +43,7 @@ const Review = () => {
     null
   );
 
-  const getCurrentMoveDescription = () => {
+  const getCurrentMoveDescription = (): string | null => {
     if (
       chessboardState == null ||
       chessboardState.game == null ||
@@ -59,10 +59,16 @@ const Review = () => {
     const moveIndex = chessboardState.moveIndex;
     if (moveIndex == 0) {
       return overallDescription;
-    } else if (moveDescriptions) {
-      return moveDescriptions[moveIndex - 1].description;
-    } else {
+    } else if (moveDescriptions == null) {
+      console.error("Move descriptions are null");
       return null;
+    } else if (moveDescriptions.length < moveIndex) {
+      console.error(
+        `Move descriptions length is ${moveDescriptions.length} but move index is ${moveIndex}`
+      );
+      return null;
+    } else {
+      return moveDescriptions[moveIndex - 1].description;
     }
   };
 
