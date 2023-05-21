@@ -1,20 +1,27 @@
 // pages/api/annotatedPgn.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import { Configuration, OpenAIApi } from "openai";
-import { OPERA_RESPONSE, generatePromptMessages } from "@/review/prompts";
+import { generatePromptMessages } from "@/review/prompts";
 import { ReviewedGame, parseGameText } from "@/review/ReviewedGame";
 import { createEvaluatedPgn } from "@/review/PgnUtils";
+import { RESPONSE as OPERA_RESPONSE } from "@/data/games/OperaGame";
+import { OpenAIStream } from "@/utils/OpenAiStream";
+//import { OpenAIStream } from "@/utils/OpenAiStream";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPEN_AI_KEY,
-});
-const openai = new OpenAIApi(configuration);
+//export const config = {
+//  runtime: "edge",
+//};
+
+//const configuration = new Configuration({
+//  apiKey: process.env.OPEN_AI_KEY,
+//});
+//const openai = new OpenAIApi(configuration);
 
 // const model = 'gpt-3.5-turbo';
 const model = "gpt-4";
 
 const fetchOpenAiCompletion = async (promptMessages: any[]): Promise<any> => {
-  const completion = await openai.createChatCompletion({
+  const payload = {
     model: model,
     n: 1,
     // The max number of tokens it the number of tokens for the completion.
@@ -25,11 +32,20 @@ const fetchOpenAiCompletion = async (promptMessages: any[]): Promise<any> => {
     max_tokens: 2048,
     temperature: 0.5,
     messages: promptMessages,
-  });
+    stream: true,
+  };
 
-  return completion;
+  //const completion = await openai.createChatCompletion(payload, {
+  //  responseType: "stream",
+  //});
+  //return completion;
+
+  const stream = await OpenAIStream(payload);
+  return stream;
 };
 
+// TODO: Make this a streaming edge function
+// copy: https://github.com/StephDietz/watch-this/blob/95f7c74f7c89256efa765ffb93d7702650536ce7/src/routes/api/getRecommendation/%2Bserver.ts#L2
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -41,15 +57,18 @@ export default async function handler(
   }
 
   const { evaluatedGame, debug } = req.body;
+  //const { evaluatedGame, debug } = await req.json();
 
-  const pgn: string = createEvaluatedPgn(evaluatedGame);
-
+  /*
   if (debug) {
     const response = OPERA_RESPONSE;
     const reviewedGame: ReviewedGame = parseGameText(response);
     res.status(200).json({ response, reviewedGame });
     return;
   }
+  */
+
+  const pgn: string = createEvaluatedPgn(evaluatedGame);
 
   const promptMessages = generatePromptMessages(pgn);
 
@@ -64,6 +83,11 @@ export default async function handler(
     return;
   }
 
+  res.status(200);
+  completion.pipe(res);
+  //res.pipe(completion);
+
+  /*
   const response = completion.data.choices[0].message.content;
   try {
     const reviewedGame = parseGameText(response);
@@ -83,4 +107,5 @@ export default async function handler(
     });
     return;
   }
+  */
 }

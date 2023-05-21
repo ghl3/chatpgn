@@ -2,11 +2,17 @@ import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import { EvaluatedPosition } from "@/chess/EvaluatedPosition";
 import { Game } from "@/chess/Game";
 import { Engine } from "@/engine/Engine";
+import { EVALUATED_GAME as OPERA_EVALUATED_GAME } from "@/data/games/OperaGame";
 
 export const evaluateGame = async (
   game: Game,
-  engine: Engine
+  engine: Engine,
+  debug: boolean = false
 ): Promise<EvaluatedGame> => {
+  if (debug) {
+    return OPERA_EVALUATED_GAME;
+  }
+
   const evaluatedPositions: EvaluatedPosition[] = [];
   for (const position of game.positions) {
     const evaluatedPosition = await engine.evaluatePosition(position.fen);

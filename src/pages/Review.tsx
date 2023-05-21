@@ -10,7 +10,11 @@ import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameInputForm from "@/components/GameInputForm";
 import PositionDescription from "@/components/PositionDescription";
-import { MoveDescription, getMoveDescriptions } from "@/review/ReviewedGame";
+import {
+  MoveDescription,
+  getMoveDescriptions,
+  parseGameText,
+} from "@/review/ReviewedGame";
 import { useRouter } from "next/router";
 import {
   ChessboardState,
@@ -33,9 +37,9 @@ const Review = () => {
   const [gameId, setGameId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-  const [moveDescriptions, setMoveDescriptions] = useState<
-    MoveDescription[] | null
-  >(null);
+  const [moveDescriptions, setMoveDescriptions] = useState<MoveDescription[]>(
+    []
+  );
   const [overallDescription, setOverallDescription] = useState<string | null>(
     null
   );
@@ -95,25 +99,59 @@ const Review = () => {
         chessboardState.loadGame(game);
 
         setLoadingMessage("Evaluating game...");
-        const evaluatedGame: EvaluatedGame = await evaluateGame(game, engine);
+        const evaluatedGame: EvaluatedGame = await evaluateGame(
+          game,
+          engine,
+          isDebug
+        );
         setEvaluatedGame(evaluatedGame);
 
         setLoadingMessage("Annotating game...");
-        const reviewResponse = await axios.post("/api/reviewGame", {
-          evaluatedGame: evaluatedGame,
-          debug: isDebug,
+        const reviewResponse = await fetch("/api/reviewGameStream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            evaluatedGame: evaluatedGame,
+            debug: isDebug,
+          }),
         });
-        const { promptMessages, response, reviewedGame } = reviewResponse.data;
+
+        if (reviewResponse.body == null) {
+          throw new Error("Review response is null");
+        }
+
+        const reader = reviewResponse.body.getReader();
+
+        // create an empty array to hold the moveDescriptions
+
+        let fullText = [];
+
+        // Do the parsing here, it's easier
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            break;
+          }
+
+          const text = new TextDecoder("utf-8").decode(value);
+          fullText.push(text);
+          console.log(text);
+          //const moveDescription = parseAnnotationLine(text);
+          //   const newMoveDescriptionJson = JSON.parse(text);
+
+          // add the new moveDescription to the existing moveDescriptions
+          //setMoveDescriptions((prevMoveDescriptions) => [
+          //  ...prevMoveDescriptions,
+          //  moveDescription,
+          //]);
+        }
+
+        //const { promptMessages, response, reviewedGame } = reviewResponse.data;
+        const response = fullText.join("");
+        const reviewedGame = parseGameText(response);
         setMoveDescriptions(getMoveDescriptions(reviewedGame));
         setOverallDescription(reviewedGame.overallDescription);
-        console.log("Evaluated game:");
-        console.log(evaluatedGame);
-        console.log("Prompt messages:");
-        console.log(promptMessages);
-        console.log("Response:");
-        console.log(response);
-        console.log("Reviewed game:");
-        console.log(reviewedGame);
       } catch (error) {
         console.error("Error fetching the game data:", error);
       } finally {

@@ -43,6 +43,18 @@ export const parseMoveDescription = (
   return { color: "white", move: "", description: "" };
 };
 
+export const parseAnnotationLine = (line: string): MoveDescription => {
+  const regex = /^(\d+\.)?\s+((\S+)\s+\{[^}]+\})/;
+  const match = line.match(regex);
+
+  if (match) {
+    const [moveNumber, move, description] = match;
+    return { color: "black", move: move, description: description };
+  } else {
+    throw new Error("Invalid annotation line");
+  }
+};
+
 export const parseGameText = (gameText: string): ReviewedGame => {
   const lines = gameText.split("\n");
   const turnDescriptions: TurnDescription[] = [];
