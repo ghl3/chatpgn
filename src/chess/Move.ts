@@ -5,4 +5,9 @@ export interface Move {
   color: "w" | "b";
   piece?: string;
   san?: string;
+  captured?: string;
+  flags?: string;
+  lan?: string;
+  before?: string;
+  after?: string;
 }
