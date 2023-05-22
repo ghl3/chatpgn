@@ -1,6 +1,7 @@
-import { parseAnnotationStream, ParsedMove } from "./AnnotationResponseParser";
+import { parseAnnotationStream } from "./AnnotationResponseParser";
 import { ReadableStream } from "web-streams-polyfill";
 import { TextEncoder } from "util";
+import { MoveDescription } from "@/review/ReviewedGame";
 
 function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
   async function* generateChunks() {
@@ -31,7 +32,7 @@ it("parses chess moves correctly", async () => {
     "Nc6 {Defending}",
   ]);
 
-  const moves: ParsedMove[] = [];
+  const moves: MoveDescription[] = [];
   for await (let move of parseAnnotationStream(stream)) {
     moves.push(move);
   }
@@ -39,27 +40,23 @@ it("parses chess moves correctly", async () => {
   expect(moves).toEqual([
     {
       color: "white",
-      index: 1,
       move: "e4",
-      comment: "Moving the pawn to the center",
+      description: "Moving the pawn to the center",
     },
     {
       color: "black",
-      index: 1,
       move: "e5",
-      comment: "Mirroring white's move",
+      description: "Mirroring white's move",
     },
     {
       color: "white",
-      index: 2,
       move: "Nf3",
-      comment: "Attacking the pawn on e5",
+      description: "Attacking the pawn on e5",
     },
     {
       color: "black",
-      index: 2,
       move: "Nc6",
-      comment: "Defending",
+      description: "Defending",
     },
   ]);
 });
@@ -74,7 +71,7 @@ it("parses chess moves correctly with additional tricky cases", async () => {
     "3...O-O-O {Black castles queenside}\n",
   ]);
 
-  const moves: ParsedMove[] = [];
+  const moves: MoveDescription[] = [];
   for await (let move of parseAnnotationStream(stream)) {
     moves.push(move);
   }
@@ -82,39 +79,33 @@ it("parses chess moves correctly with additional tricky cases", async () => {
   expect(moves).toEqual([
     {
       color: "white",
-      index: 1,
       move: "Nf3",
-      comment: "Knight to f3",
+      description: "Knight to f3",
     },
     {
       color: "black",
-      index: 1,
       move: "e5",
-      comment: "Pawn to e5",
+      description: "Pawn to e5",
     },
     {
       color: "white",
-      index: 2,
       move: "Bb5+",
-      comment: "Bishop to b5 check",
+      description: "Bishop to b5 check",
     },
     {
       color: "black",
-      index: 2,
       move: "Bd7",
-      comment: "Bishop to d7",
+      description: "Bishop to d7",
     },
     {
       color: "white",
-      index: 3,
       move: "O-O",
-      comment: "White castles",
+      description: "White castles",
     },
     {
       color: "black",
-      index: 3,
       move: "O-O-O",
-      comment: "Black castles queenside",
+      description: "Black castles queenside",
     },
   ]);
 });

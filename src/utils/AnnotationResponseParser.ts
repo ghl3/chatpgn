@@ -1,19 +1,13 @@
+import { MoveDescription } from "@/review/ReviewedGame";
 import { TextDecoder } from "util";
-
-export type ParsedMove = {
-  color: "white" | "black";
-  index: number;
-  move: string;
-  comment?: string;
-};
 
 export async function* parseAnnotationStream(
   stream: ReadableStream<Uint8Array>
-): AsyncGenerator<ParsedMove, void, unknown> {
+): AsyncGenerator<MoveDescription, void, unknown> {
   let buffer = "";
   let currentIndex = 1;
   let currentColor: "white" | "black" = "white";
-  let parsed: ParsedMove[] = [];
+  let parsed: MoveDescription[] = [];
   const reader = stream.getReader();
 
   while (true) {
@@ -54,8 +48,8 @@ export function parseMoves(
   text: string,
   startingIndex: number,
   startingColor: "white" | "black"
-): { parsed: ParsedMove[]; consumedChars: number } {
-  const parsed: ParsedMove[] = [];
+): { parsed: MoveDescription[]; consumedChars: number } {
+  const parsed: MoveDescription[] = [];
   let index = startingIndex;
   let color = startingColor;
   let consumedChars = 0;
@@ -66,10 +60,9 @@ export function parseMoves(
   let match;
   while ((match = regex.exec(text)) !== null) {
     parsed.push({
-      color,
-      index,
+      color: color,
       move: match[2],
-      comment: match[4] || undefined,
+      description: match[4] || "",
     });
 
     consumedChars = match.index + match[0].length;
