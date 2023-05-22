@@ -122,8 +122,6 @@ const Review = () => {
 
         const reader = reviewResponse.body.getReader();
 
-        // create an empty array to hold the moveDescriptions
-
         let fullText = [];
 
         // Do the parsing here, it's easier
@@ -137,17 +135,8 @@ const Review = () => {
           const text = new TextDecoder("utf-8").decode(value);
           fullText.push(text);
           console.log(text);
-          //const moveDescription = parseAnnotationLine(text);
-          //   const newMoveDescriptionJson = JSON.parse(text);
-
-          // add the new moveDescription to the existing moveDescriptions
-          //setMoveDescriptions((prevMoveDescriptions) => [
-          //  ...prevMoveDescriptions,
-          //  moveDescription,
-          //]);
         }
 
-        //const { promptMessages, response, reviewedGame } = reviewResponse.data;
         const response = fullText.join("");
         const reviewedGame = parseGameText(response);
         setMoveDescriptions(getMoveDescriptions(reviewedGame));

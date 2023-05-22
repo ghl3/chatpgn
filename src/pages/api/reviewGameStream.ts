@@ -40,9 +40,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Create a stream of response tokens
     const stream = await OpenAIStream(payload);
 
-    //const transformer = new AnnotationTransform();
-    //const transformedStream = stream.pipeThrough(transformer.transform());
-
     return new Response(stream);
   } catch (error) {
     console.error(error); // Log the error for debugging purposes

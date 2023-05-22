@@ -48,7 +48,7 @@ export async function OpenAIStream(payload: CreateCompletionRequest) {
       function onParse(event: ParsedEvent | ReconnectInterval) {
         if (event.type === "event") {
           const data = event.data;
-          if (data === "[DONE]") {
+          if (data === `[DONE]`) {
             controller.close();
             return;
           }
@@ -68,18 +68,8 @@ export async function OpenAIStream(payload: CreateCompletionRequest) {
               return;
             }
 
-            //const queue = encoder.encode(text);
-
             const chunk = encoder.encode(text);
             controller.enqueue(chunk);
-            /*
-            if (counter < 2 && (text.match(/\n/) || []).length) {
-              return;
-            }
-            console.log(`Got text: ${text}`);
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-            */
             counter++;
           } catch (e) {
             controller.error(e);
