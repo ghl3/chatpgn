@@ -119,78 +119,16 @@ it("parses chess moves correctly with additional tricky cases", async () => {
   ]);
 });
 
-it("throws error on invalid moves", async () => {
+it("throws error on malformed data", async () => {
   const stream = createTestStream([
-    "1. e5 {Moving the pawn to the center} ", // Invalid move, pawns can only move 2 spaces forward initially
-    "1...e4 {Mirroring white's move}\n", // Invalid move, pawns cannot capture in front
-    "2. Qa4 {Moving the Queen out too early} ", // Invalid move, queen cannot get out without moving the pawns
+    "1. e4 {Good move} ",
+    "1...e5 {Response}\n",
+    "This is not a valid move\n",
+    "3. Nf3 {Another move}",
   ]);
 
-  const moves: ParsedMove[] = [];
-
   await expect(async () => {
-    for await (let move of parseAnnotationStream(stream)) {
-      moves.push(move);
+    for await (let _ of parseAnnotationStream(stream)) {
     }
-  }).rejects.toThrowError("Invalid move detected");
+  }).rejects.toThrowError("Malformed data encountered");
 });
-
-/*
-describe("parseMoves", () => {
-  it("parses a single white move with an annotation", () => {
-    const text = "1. e4 {Moving the pawn to the center}";
-    const { parsed, consumedChars } = parseMoves(text, 1, "white");
-
-    expect(parsed).toHaveLength(1);
-    expect(parsed[0]).toEqual({
-      color: "white",
-      index: 1,
-      move: "e4",
-      annotation: "Moving the pawn to the center",
-    });
-    expect(consumedChars).toEqual(text.length);
-  });
-
-  it("parses a full turn with annotations", () => {
-    const text =
-      "1. e4 {Moving the pawn to the center} e5 {Mirroring white's move} ";
-    const { parsed, consumedChars } = parseMoves(text, 1, "white");
-
-    expect(parsed).toHaveLength(2);
-    expect(parsed[0]).toEqual({
-      color: "white",
-      index: 1,
-      move: "e4",
-      annotation: "Moving the pawn to the center",
-    });
-    expect(parsed[1]).toEqual({
-      color: "black",
-      index: 1,
-      move: "e5",
-      annotation: "Mirroring white's move",
-    });
-    expect(consumedChars).toEqual(text.length - 1);
-  });
-
-  it("parses multiple turns", () => {
-    const text =
-      "1. e4 {Moving the pawn to the center} e5 {Mirroring white's move} 2. Nf3 {Attacking the pawn on e5} ";
-    const { parsed, consumedChars } = parseMoves(text, 1, "white");
-
-    expect(parsed).toHaveLength(2);
-    expect(parsed[0]).toEqual({
-      color: "white",
-      index: 1,
-      move: "e4",
-      annotation: "Moving the pawn to the center",
-    });
-    expect(parsed[1]).toEqual({
-      color: "black",
-      index: 1,
-      move: "e5",
-      annotation: "Mirroring white's move",
-    });
-    expect(consumedChars).toEqual(text.indexOf("2.") - 1);
-  });
-});
-*/

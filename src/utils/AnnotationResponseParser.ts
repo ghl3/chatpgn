@@ -1,4 +1,4 @@
-import { TextEncoder, TextDecoder } from "util"; // This is the addition.
+import { TextDecoder } from "util";
 
 export type ParsedMove = {
   color: "white" | "black";
@@ -7,14 +7,13 @@ export type ParsedMove = {
   comment?: string;
 };
 
-// In your generator function:
 export async function* parseAnnotationStream(
   stream: ReadableStream<Uint8Array>
 ): AsyncGenerator<ParsedMove, void, unknown> {
   let buffer = "";
   let currentIndex = 1;
   let currentColor: "white" | "black" = "white";
-  let parsed = [];
+  let parsed: ParsedMove[] = [];
   const reader = stream.getReader();
 
   while (true) {
@@ -27,9 +26,13 @@ export async function* parseAnnotationStream(
     const text = new TextDecoder("utf-8").decode(value);
     buffer += text;
 
-    const result = parseMoves(buffer, currentIndex, currentColor);
-    parsed = result.parsed;
-    buffer = buffer.slice(result.consumedChars);
+    try {
+      const result = parseMoves(buffer, currentIndex, currentColor);
+      parsed = result.parsed;
+      buffer = buffer.slice(result.consumedChars);
+    } catch (error) {
+      throw error;
+    }
 
     while (parsed.length > 0) {
       const move = parsed.shift();
@@ -58,21 +61,10 @@ export function parseMoves(
   let consumedChars = 0;
 
   const regex =
-    /(\d+\.)?\s*([NBKRQP]?[a-h][1-8][+#]?|O-O-O|O-O)(\s*\{([^}]+)\})?/g;
+    /(\d+\.)?\s*([NBKRQ]?[a-h]?[1-8]?[x]?[a-h][1-8][+#]?|O-O-O|O-O)(\s*\{([^}]+)\})?/g;
 
   let match;
   while ((match = regex.exec(text)) !== null) {
-    if (match[1]) {
-      // This is a new turn
-      color = "white";
-      if (index !== startingIndex) {
-        index++;
-      }
-    } else {
-      // This is a second move in a turn
-      color = "black";
-    }
-
     parsed.push({
       color,
       index,
@@ -82,9 +74,17 @@ export function parseMoves(
 
     consumedChars = match.index + match[0].length;
 
-    if (color === "black") {
-      break; // we stop after parsing a black move
+    if (color === "white") {
+      color = "black";
+    } else {
+      color = "white";
+      index++;
     }
+  }
+
+  // If no moves were parsed from the input, it was malformed
+  if (parsed.length === 0) {
+    throw new Error("Malformed data encountered");
   }
 
   return { parsed, consumedChars };
