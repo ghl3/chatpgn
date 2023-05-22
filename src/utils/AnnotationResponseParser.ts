@@ -4,7 +4,7 @@ export type ParsedMove = {
   color: "white" | "black";
   index: number;
   move: string;
-  annotation?: string;
+  comment?: string;
 };
 
 // In your generator function:
@@ -38,8 +38,10 @@ export async function* parseAnnotationStream(
 
         if (move.color === "black") {
           currentIndex++;
+          currentColor = "white";
+        } else {
+          currentColor = "black";
         }
-        currentColor = move.color === "white" ? "black" : "white";
       }
     }
   }
@@ -55,16 +57,17 @@ export function parseMoves(
   let color = startingColor;
   let consumedChars = 0;
 
-  const regex = /(\d+\.)?\s*([a-h][1-8][+#]?|O-O-O|O-O)(\s*\{([^}]+)\})?/g;
+  const regex =
+    /(\d+\.)?\s*([NBKRQP]?[a-h][1-8][+#]?|O-O-O|O-O)(\s*\{([^}]+)\})?/g;
 
   let match;
   while ((match = regex.exec(text)) !== null) {
-    if (index === startingIndex || match[1]) {
+    if (match[1]) {
       // This is a new turn
+      color = "white";
       if (index !== startingIndex) {
         index++;
       }
-      color = "white";
     } else {
       // This is a second move in a turn
       color = "black";
@@ -74,7 +77,7 @@ export function parseMoves(
       color,
       index,
       move: match[2],
-      annotation: match[4] || undefined,
+      comment: match[4] || undefined,
     });
 
     consumedChars = match.index + match[0].length;

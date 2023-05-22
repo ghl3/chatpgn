@@ -1,10 +1,6 @@
-import {
-  parseAnnotationStream,
-  ParsedMove,
-  parseMoves,
-} from "./AnnotationResponseParser"; // Adjust the import according to your file structure
+import { parseAnnotationStream, ParsedMove } from "./AnnotationResponseParser";
 import { ReadableStream } from "web-streams-polyfill";
-import { TextEncoder, TextDecoder } from "util"; // This is the addition.
+import { TextEncoder } from "util";
 
 function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
   async function* generateChunks() {
@@ -66,6 +62,77 @@ it("parses chess moves correctly", async () => {
       comment: "Defending",
     },
   ]);
+});
+
+it("parses chess moves correctly with additional tricky cases", async () => {
+  const stream = createTestStream([
+    "1. Nf3 {Knight to f3} ",
+    "1...e5 {Pawn to e5}\n",
+    "2. Bb5+ {Bishop to b5 check} ",
+    "Bd7 {Bishop to d7}\n",
+    "3. O-O {White castles} ",
+    "3...O-O-O {Black castles queenside}\n",
+  ]);
+
+  const moves: ParsedMove[] = [];
+  for await (let move of parseAnnotationStream(stream)) {
+    moves.push(move);
+  }
+
+  expect(moves).toEqual([
+    {
+      color: "white",
+      index: 1,
+      move: "Nf3",
+      comment: "Knight to f3",
+    },
+    {
+      color: "black",
+      index: 1,
+      move: "e5",
+      comment: "Pawn to e5",
+    },
+    {
+      color: "white",
+      index: 2,
+      move: "Bb5+",
+      comment: "Bishop to b5 check",
+    },
+    {
+      color: "black",
+      index: 2,
+      move: "Bd7",
+      comment: "Bishop to d7",
+    },
+    {
+      color: "white",
+      index: 3,
+      move: "O-O",
+      comment: "White castles",
+    },
+    {
+      color: "black",
+      index: 3,
+      move: "O-O-O",
+      comment: "Black castles queenside",
+    },
+  ]);
+});
+
+it("throws error on invalid moves", async () => {
+  const stream = createTestStream([
+    "1. e5 {Moving the pawn to the center} ", // Invalid move, pawns can only move 2 spaces forward initially
+    "1...e4 {Mirroring white's move}\n", // Invalid move, pawns cannot capture in front
+    "2. Qa4 {Moving the Queen out too early} ", // Invalid move, queen cannot get out without moving the pawns
+  ]);
+
+  const moves: ParsedMove[] = [];
+
+  await expect(async () => {
+    for await (let move of parseAnnotationStream(stream)) {
+      moves.push(move);
+    }
+  }).rejects.toThrowError("Invalid move detected");
 });
 
 /*
