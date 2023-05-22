@@ -21,6 +21,7 @@ import {
   useChessboardState,
 } from "@/hooks/UseChessboardState";
 import Chessboard from "@/components/Chessboard";
+import { parseAnnotationStream } from "@/utils/AnnotationResponseParser";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -120,8 +121,22 @@ const Review = () => {
           throw new Error("Review response is null");
         }
 
-        const reader = reviewResponse.body.getReader();
+        let firstItem = true;
+        for await (const item of parseAnnotationStream(reviewResponse.body)) {
+          if (firstItem) {
+            // The first item is the overall description
+            setOverallDescription(item as string);
+            firstItem = false;
+          } else {
+            // Subsequent items are move descriptions
+            setMoveDescriptions((moveDescriptions) => [
+              ...moveDescriptions,
+              item as MoveDescription,
+            ]);
+          }
+        }
 
+        /*
         let fullText = [];
 
         // Do the parsing here, it's easier
@@ -140,7 +155,8 @@ const Review = () => {
         const response = fullText.join("");
         const reviewedGame = parseGameText(response);
         setMoveDescriptions(getMoveDescriptions(reviewedGame));
-        setOverallDescription(reviewedGame.overallDescription);
+        */
+        setOverallDescription(""); //reviewedGame.overallDescription);
       } catch (error) {
         console.error("Error fetching the game data:", error);
       } finally {

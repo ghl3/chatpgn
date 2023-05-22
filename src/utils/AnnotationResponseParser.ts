@@ -1,58 +1,86 @@
 import { MoveDescription } from "@/review/ReviewedGame";
-import { TextDecoder } from "util";
+import { TextDecoder } from "text-encoding";
 
 export async function* parseAnnotationStream(
   stream: ReadableStream<Uint8Array>
-): AsyncGenerator<MoveDescription, void, unknown> {
+): AsyncGenerator<string | MoveDescription, void, unknown> {
   let buffer = "";
-  let currentIndex = 1;
   let currentColor: "white" | "black" = "white";
   let parsed: MoveDescription[] = [];
+  let description: string | null = null;
   const reader = stream.getReader();
 
   while (true) {
     const { done, value } = await reader.read();
 
-    if (done) {
-      break;
-    }
-
     const text = new TextDecoder("utf-8").decode(value);
     buffer += text;
 
-    try {
-      const result = parseMoves(buffer, currentIndex, currentColor);
-      parsed = result.parsed;
-      buffer = buffer.slice(result.consumedChars);
-    } catch (error) {
-      throw error;
-    }
-
-    while (parsed.length > 0) {
-      const move = parsed.shift();
-      if (move) {
-        yield move;
-
-        if (move.color === "black") {
-          currentIndex++;
-          currentColor = "white";
+    // If description not yet parsed, do that first
+    if (!description) {
+      let descriptionEndIndex = buffer.indexOf("\n\n");
+      if (descriptionEndIndex === -1) {
+        // We don't yet have the full description, wait for more data
+        if (done) {
+          throw new Error(
+            "Malformed data encountered: description is incomplete."
+          );
         } else {
-          currentColor = "black";
+          continue;
         }
       }
+      description = buffer.slice(0, descriptionEndIndex).trim();
+      buffer = buffer.slice(descriptionEndIndex + 2); // 2 for "\n\n"
+      yield description;
+    }
+
+    while (true) {
+      let result;
+      try {
+        result = parseMoves(buffer, currentColor);
+      } catch (error) {
+        throw error;
+      }
+
+      if (result.moreExpected && !done) {
+        // More chunks are expected, so don't parse the current buffer yet
+        break;
+      } else {
+        parsed = result.parsed;
+        buffer = buffer.slice(result.consumedChars);
+      }
+
+      while (parsed.length > 0) {
+        const move = parsed.shift();
+        if (move) {
+          yield move;
+          currentColor = move.color === "white" ? "black" : "white";
+        }
+      }
+
+      if (done) {
+        if (buffer.trim() !== "") {
+          // Remaining buffer contains data that can't be parsed as a move.
+          throw new Error("Malformed data encountered");
+        }
+        break;
+      }
+    }
+
+    if (done) {
+      break;
     }
   }
 }
 
 export function parseMoves(
   text: string,
-  startingIndex: number,
   startingColor: "white" | "black"
-): { parsed: MoveDescription[]; consumedChars: number } {
+): { parsed: MoveDescription[]; consumedChars: number; moreExpected: boolean } {
   const parsed: MoveDescription[] = [];
-  let index = startingIndex;
   let color = startingColor;
   let consumedChars = 0;
+  let moreExpected = false;
 
   const regex =
     /(\d+\.)?\s*([NBKRQ]?[a-h]?[1-8]?[x]?[a-h][1-8][+#]?|O-O-O|O-O)(\s*\{([^}]+)\})?/g;
@@ -71,14 +99,13 @@ export function parseMoves(
       color = "black";
     } else {
       color = "white";
-      index++;
     }
   }
 
-  // If no moves were parsed from the input, it was malformed
-  if (parsed.length === 0) {
-    throw new Error("Malformed data encountered");
-  }
+  // Check if there's more move data expected.
+  moreExpected = !!text
+    .substring(consumedChars)
+    .match(/\d+\.\s*[NBKRQa-h1-8x#O+-]?/);
 
-  return { parsed, consumedChars };
+  return { parsed, consumedChars, moreExpected };
 }

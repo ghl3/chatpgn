@@ -26,13 +26,14 @@ function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
 // We'll use an async function to test async generators
 it("parses chess moves correctly", async () => {
   const stream = createTestStream([
+    "Overall Description\n\n",
     "1. e4 {Moving the pawn to the center} ",
     "1...e5 {Mirroring white's move}\n",
     "2. Nf3 {Attacking the pawn on e5} ",
     "Nc6 {Defending}",
   ]);
 
-  const moves: MoveDescription[] = [];
+  const moves: (MoveDescription | string)[] = [];
   for await (let move of parseAnnotationStream(stream)) {
     moves.push(move);
   }
@@ -63,6 +64,7 @@ it("parses chess moves correctly", async () => {
 
 it("parses chess moves correctly with additional tricky cases", async () => {
   const stream = createTestStream([
+    "Overall Description\n\n",
     "1. Nf3 {Knight to f3} ",
     "1...e5 {Pawn to e5}\n",
     "2. Bb5+ {Bishop to b5 check} ",
@@ -71,7 +73,7 @@ it("parses chess moves correctly with additional tricky cases", async () => {
     "3...O-O-O {Black castles queenside}\n",
   ]);
 
-  const moves: MoveDescription[] = [];
+  const moves: (MoveDescription | string)[] = [];
   for await (let move of parseAnnotationStream(stream)) {
     moves.push(move);
   }
@@ -112,6 +114,7 @@ it("parses chess moves correctly with additional tricky cases", async () => {
 
 it("throws error on malformed data", async () => {
   const stream = createTestStream([
+    "Overall Description\n\n",
     "1. e4 {Good move} ",
     "1...e5 {Response}\n",
     "This is not a valid move\n",
