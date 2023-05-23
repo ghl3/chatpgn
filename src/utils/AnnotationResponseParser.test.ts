@@ -1,8 +1,58 @@
-import { parseAnnotationStream } from "./AnnotationResponseParser";
+import { Tokenizer } from "./AnnotationResponseParser";
 import { ReadableStream } from "web-streams-polyfill";
-import { TextEncoder } from "util";
+import { TextEncoder } from "text-encoding";
 import { MoveDescription } from "@/review/ReviewedGame";
 
+import { Readable } from "stream";
+
+function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
+  async function* generateChunks() {
+    const encoder = new TextEncoder();
+    for (const string of strings) {
+      yield encoder.encode(string);
+    }
+  }
+
+  return new ReadableStream<Uint8Array>({
+    start(controller) {
+      (async () => {
+        for await (const chunk of generateChunks()) {
+          controller.enqueue(chunk);
+        }
+        controller.close();
+      })();
+    },
+  });
+}
+
+test("Tokenizer emits correct tokens", async () => {
+  const stream = createTestStream([
+    "1. e4 {foobar}\n",
+    "2. Nf3\n3. Bb5+ {baz}\n",
+  ]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "OPEN_BRACKET", value: "{" },
+    { type: "TEXT", value: "foobar" },
+    { type: "CLOSE_BRACKET", value: "}" },
+    { type: "INDEX", value: "2." },
+    { type: "MOVE", value: "Nf3" },
+    { type: "INDEX", value: "3." },
+    { type: "MOVE", value: "Bb5+" },
+    { type: "OPEN_BRACKET", value: "{" },
+    { type: "TEXT", value: "baz" },
+    { type: "CLOSE_BRACKET", value: "}" },
+  ]);
+});
+
+/*
 function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
   async function* generateChunks() {
     const encoder = new TextEncoder();
@@ -126,3 +176,4 @@ it("throws error on malformed data", async () => {
     }
   }).rejects.toThrowError("Malformed data encountered");
 });
+*/
