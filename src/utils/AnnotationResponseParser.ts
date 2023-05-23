@@ -18,7 +18,7 @@ export async function* parseAnnotationStream(
 
     // If description not yet parsed, do that first
     if (!description) {
-      let descriptionEndIndex = buffer.indexOf("\n\n");
+      let descriptionEndIndex = buffer.search(/\n{2,}/);
       if (descriptionEndIndex === -1) {
         // We don't yet have the full description, wait for more data
         if (done) {
@@ -29,9 +29,12 @@ export async function* parseAnnotationStream(
           continue;
         }
       }
-      description = buffer.slice(0, descriptionEndIndex).trim();
-      buffer = buffer.slice(descriptionEndIndex + 2); // 2 for "\n\n"
-      yield description;
+      let descriptionMatch = buffer.match(/\n{2,}/);
+      if (descriptionMatch) {
+        description = buffer.slice(0, descriptionEndIndex).trim();
+        buffer = buffer.slice(descriptionEndIndex + descriptionMatch[0].length);
+        yield description;
+      }
     }
 
     while (true) {
