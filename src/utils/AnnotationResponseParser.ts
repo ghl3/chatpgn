@@ -5,8 +5,8 @@ export type TokenType =
   | "TEXT"
   | "MOVE"
   | "INDEX"
-  | "OPEN_BRACKET"
-  | "CLOSE_BRACKET";
+  | "OPEN_COMMENT"
+  | "CLOSE_COMMENT";
 
 export interface Token {
   type: TokenType;
@@ -20,23 +20,38 @@ export class Tokenizer {
     const decoder = new TextDecoder("utf-8");
     let reader = stream.getReader();
     let buffer = "";
+    let insideComment = false;
 
     while (true) {
-      let { value: chunk, done } = await reader.read();
-      console.log(
-        `Chunk: ${chunk}, Decoded: ${decoder.decode(chunk)} Done: ${done}`
-      );
-      buffer += decoder.decode(chunk); //, { stream: !done });
+      const { done, value } = await reader.read();
+      if (value) {
+        buffer += decoder.decode(value, { stream: true });
+      }
+      if (done) {
+        buffer += decoder.decode(); // finish the stream
+      }
 
-      // Log the buffer content
-      console.log(`Buffer: ${buffer}`);
+      while (buffer.length > 0) {
+        let match = null;
 
-      while (true) {
-        let match;
+        // Check for open comment
+        if (!insideComment && (match = buffer.match(/^\{\s*/))) {
+          insideComment = true;
+          yield { type: "OPEN_COMMENT", value: match[0].trim() };
+          buffer = buffer.slice(match[0].length);
+          continue;
+        }
+
+        // Check for close comment
+        if (insideComment && (match = buffer.match(/^\}\s*/))) {
+          insideComment = false;
+          yield { type: "CLOSE_COMMENT", value: match[0].trim() };
+          buffer = buffer.slice(match[0].length);
+          continue;
+        }
 
         // Check for move index
-        if ((match = buffer.match(/^\d+\.\s*/))) {
-          console.log(`Matched INDEX: ${match[0].trim()}`);
+        if (!insideComment && (match = buffer.match(/^\d+\.\s*/))) {
           yield { type: "INDEX", value: match[0].trim() };
           buffer = buffer.slice(match[0].length);
           continue;
@@ -44,45 +59,28 @@ export class Tokenizer {
 
         // Check for move
         if (
+          !insideComment &&
           (match = buffer.match(
             /^(O-O-O|O-O|[a-h][1-8][\+#]?|N[a-h][1-8][\+#]?|B[a-h][1-8][\+#]?|R[a-h][1-8][\+#]?|Q[a-h][1-8][\+#]?|K[a-h][1-8][\+#]?)\s*/
           ))
         ) {
-          console.log(`Matched MOVE: ${match[0].trim()}`);
           yield { type: "MOVE", value: match[0].trim() };
           buffer = buffer.slice(match[0].length);
           continue;
         }
 
-        // Check for opening bracket
-        if ((match = buffer.match(/^\{\s*/))) {
-          console.log(`Matched OPEN_BRACKET: ${match[0].trim()}`);
-          yield { type: "OPEN_BRACKET", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
-        }
-
-        // Check for closing bracket
-        if ((match = buffer.match(/^\}\s*/))) {
-          console.log(`Matched CLOSE_BRACKET: ${match[0].trim()}`);
-          yield { type: "CLOSE_BRACKET", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
-        }
         // Check for text
-        if ((match = buffer.match(/^[^\n^\{^\}]*\n+/))) {
-          console.log(`Matched TEXT: ${match[0].trim()}`);
+        if (insideComment && (match = buffer.match(/^[^\}]*?(?=\})/))) {
           yield { type: "TEXT", value: match[0].trim() };
           buffer = buffer.slice(match[0].length);
           continue;
         }
-
-        break;
+        // If no match is found, break the loop
+        if (!match) break;
       }
 
       if (done) {
         if (buffer.length > 0) {
-          console.log(`Yielded remaining TEXT: ${buffer}`);
           yield { type: "TEXT", value: buffer };
         }
         break;

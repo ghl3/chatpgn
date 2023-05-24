@@ -39,16 +39,16 @@ test("Tokenizer emits correct tokens", async () => {
   expect(tokens).toEqual([
     { type: "INDEX", value: "1." },
     { type: "MOVE", value: "e4" },
-    { type: "OPEN_BRACKET", value: "{" },
+    { type: "OPEN_COMMENT", value: "{" },
     { type: "TEXT", value: "foobar" },
-    { type: "CLOSE_BRACKET", value: "}" },
+    { type: "CLOSE_COMMENT", value: "}" },
     { type: "INDEX", value: "2." },
     { type: "MOVE", value: "Nf3" },
     { type: "INDEX", value: "3." },
     { type: "MOVE", value: "Bb5+" },
-    { type: "OPEN_BRACKET", value: "{" },
+    { type: "OPEN_COMMENT", value: "{" },
     { type: "TEXT", value: "baz" },
-    { type: "CLOSE_BRACKET", value: "}" },
+    { type: "CLOSE_COMMENT", value: "}" },
   ]);
 });
 
