@@ -21,68 +21,65 @@ export class Tokenizer {
     let reader = stream.getReader();
     let buffer = "";
     let insideComment = false;
+    let done = false;
 
     while (true) {
-      const { done, value } = await reader.read();
-      if (value) {
-        buffer += decoder.decode(value, { stream: true });
-      }
-      if (done) {
-        buffer += decoder.decode(); // finish the stream
-      }
-
-      while (buffer.length > 0) {
-        let match = null;
-
-        // Check for open comment
-        if (!insideComment && (match = buffer.match(/^\{\s*/))) {
-          insideComment = true;
-          yield { type: "OPEN_COMMENT", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
+      if (buffer.length === 0) {
+        const { done: streamDone, value } = await reader.read();
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
         }
-
-        // Check for close comment
-        if (insideComment && (match = buffer.match(/^\}\s*/))) {
-          insideComment = false;
-          yield { type: "CLOSE_COMMENT", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
+        if (streamDone) {
+          buffer += decoder.decode(); // finish the stream
+          done = streamDone;
         }
-
-        // Check for move index
-        if (!insideComment && (match = buffer.match(/^\d+\.\s*/))) {
-          yield { type: "INDEX", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
-        }
-
-        // Check for move
-        if (
-          !insideComment &&
-          (match = buffer.match(
-            /^(O-O-O|O-O|[a-h][1-8][\+#]?|N[a-h][1-8][\+#]?|B[a-h][1-8][\+#]?|R[a-h][1-8][\+#]?|Q[a-h][1-8][\+#]?|K[a-h][1-8][\+#]?)\s*/
-          ))
-        ) {
-          yield { type: "MOVE", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
-        }
-
-        // Check for text
-        if (insideComment && (match = buffer.match(/^[^\}]*?(?=\})/))) {
-          yield { type: "TEXT", value: match[0].trim() };
-          buffer = buffer.slice(match[0].length);
-          continue;
-        }
-        // If no match is found, break the loop
-        if (!match) break;
       }
 
-      if (done) {
-        if (buffer.length > 0) {
-          yield { type: "TEXT", value: buffer };
-        }
+      let match = null;
+
+      // Check for open comment
+      if (!insideComment && (match = buffer.match(/^\{\s*/))) {
+        insideComment = true;
+        yield { type: "OPEN_COMMENT", value: match[0].trim() };
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
+      // Check for close comment
+      if (insideComment && (match = buffer.match(/^\}\s*/))) {
+        insideComment = false;
+        yield { type: "CLOSE_COMMENT", value: match[0].trim() };
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
+      // Check for move index
+      if (!insideComment && (match = buffer.match(/^\d+\.\s*/))) {
+        yield { type: "INDEX", value: match[0].trim() };
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
+      // Check for move
+      if (
+        !insideComment &&
+        (match = buffer.match(
+          /^(O-O-O|O-O|[a-h][1-8][\+#]?|N[a-h][1-8][\+#]?|B[a-h][1-8][\+#]?|R[a-h][1-8][\+#]?|Q[a-h][1-8][\+#]?|K[a-h][1-8][\+#]?)\s*/
+        ))
+      ) {
+        yield { type: "MOVE", value: match[0].trim() };
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
+      // Check for text
+      if (insideComment && (match = buffer.match(/^[^\}]*?(?=\})/))) {
+        yield { type: "TEXT", value: match[0].trim() };
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
+      if (buffer.length === 0 && done) {
         break;
       }
     }
