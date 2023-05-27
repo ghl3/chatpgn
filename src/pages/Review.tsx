@@ -21,7 +21,7 @@ import {
   useChessboardState,
 } from "@/hooks/UseChessboardState";
 import Chessboard from "@/components/Chessboard";
-import { parseAnnotationStream } from "@/utils/AnnotationResponseParser";
+import { parseAnnotationStream } from "@/review/ResponseTokenizer";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
