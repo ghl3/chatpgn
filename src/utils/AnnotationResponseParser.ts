@@ -82,9 +82,10 @@ export class Tokenizer {
         buffer = buffer.slice(match[0].length);
         continue;
       }
-
-      if (buffer.length === 0 && done) {
-        break;
+      if (buffer.length === 0) {
+        if (done) {
+          break;
+        }
       } else {
         yield { type: "UNPARSED", value: buffer };
         return;

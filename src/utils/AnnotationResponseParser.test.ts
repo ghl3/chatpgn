@@ -85,6 +85,83 @@ test("Tokenizer handles overall description", async () => {
   ]);
 });
 
+test("Tokenizer handles broken input", async () => {
+  const stream = createTestStream(["1. e4 {This comment is not closed\n"]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "This comment is not closed" },
+  ]);
+});
+
+test("Tokenizer handles empty input", async () => {
+  const stream = createTestStream([""]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([]);
+});
+
+test("Tokenizer ignores spaces and newlines", async () => {
+  const stream = createTestStream(["\n    \n  \n"]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([]);
+});
+
+test("Tokenizer handles nested comments", async () => {
+  const stream = createTestStream([
+    "1. e4 {This is a comment {This is a nested comment} end of comment}\n",
+  ]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "This is a comment" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "This is a nested comment" },
+    { type: "CLOSE_COMMENT", value: "}" },
+    { type: "TEXT", value: "end of comment" },
+    { type: "CLOSE_COMMENT", value: "}" },
+  ]);
+});
+
+test("Tokenizer handles moves without comments", async () => {
+  const stream = createTestStream(["1. e4\n2. Nf3\n"]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "INDEX", value: "2." },
+    { type: "MOVE", value: "Nf3" },
+  ]);
+});
+
 /*
 function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
   async function* generateChunks() {
