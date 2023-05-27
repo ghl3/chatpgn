@@ -52,6 +52,39 @@ test("Tokenizer emits correct tokens", async () => {
   ]);
 });
 
+test("Tokenizer handles overall description", async () => {
+  const stream = createTestStream([
+    "This is a game of chess.\n\n",
+    "1. e4 {White opens with pawn to e4.}\n",
+    "2. Nf3 {Knight to f3.}\n",
+    "3. Bb5+ {Bishop to b5, check!}\n",
+  ]);
+  const tokens = [];
+
+  for await (let token of Tokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "TEXT", value: "This is a game of chess." },
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "White opens with pawn to e4." },
+    { type: "CLOSE_COMMENT", value: "}" },
+    { type: "INDEX", value: "2." },
+    { type: "MOVE", value: "Nf3" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "Knight to f3." },
+    { type: "CLOSE_COMMENT", value: "}" },
+    { type: "INDEX", value: "3." },
+    { type: "MOVE", value: "Bb5+" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "Bishop to b5, check!" },
+    { type: "CLOSE_COMMENT", value: "}" },
+  ]);
+});
+
 /*
 function createTestStream(strings: string[]): ReadableStream<Uint8Array> {
   async function* generateChunks() {

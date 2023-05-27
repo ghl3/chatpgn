@@ -6,7 +6,8 @@ export type TokenType =
   | "MOVE"
   | "INDEX"
   | "OPEN_COMMENT"
-  | "CLOSE_COMMENT";
+  | "CLOSE_COMMENT"
+  | "UNPARSED";
 
 export interface Token {
   type: TokenType;
@@ -20,7 +21,7 @@ export class Tokenizer {
     const decoder = new TextDecoder("utf-8");
     let reader = stream.getReader();
     let buffer = "";
-    let insideComment = false;
+    //    let insideComment = false;
     let done = false;
 
     while (true) {
@@ -37,24 +38,28 @@ export class Tokenizer {
 
       let match = null;
 
+      // Skip newlines and whitespace
+      if ((match = buffer.match(/^(\s*\n)+/))) {
+        buffer = buffer.slice(match[0].length);
+        continue;
+      }
+
       // Check for open comment
-      if (!insideComment && (match = buffer.match(/^\{\s*/))) {
-        insideComment = true;
+      if ((match = buffer.match(/^\{\s*/))) {
         yield { type: "OPEN_COMMENT", value: match[0].trim() };
         buffer = buffer.slice(match[0].length);
         continue;
       }
 
       // Check for close comment
-      if (insideComment && (match = buffer.match(/^\}\s*/))) {
-        insideComment = false;
+      if ((match = buffer.match(/^\}\s*/))) {
         yield { type: "CLOSE_COMMENT", value: match[0].trim() };
         buffer = buffer.slice(match[0].length);
         continue;
       }
 
       // Check for move index
-      if (!insideComment && (match = buffer.match(/^\d+\.\s*/))) {
+      if ((match = buffer.match(/^\d+\.\s*/))) {
         yield { type: "INDEX", value: match[0].trim() };
         buffer = buffer.slice(match[0].length);
         continue;
@@ -62,7 +67,6 @@ export class Tokenizer {
 
       // Check for move
       if (
-        !insideComment &&
         (match = buffer.match(
           /^(O-O-O|O-O|[a-h][1-8][\+#]?|N[a-h][1-8][\+#]?|B[a-h][1-8][\+#]?|R[a-h][1-8][\+#]?|Q[a-h][1-8][\+#]?|K[a-h][1-8][\+#]?)\s*/
         ))
@@ -73,7 +77,7 @@ export class Tokenizer {
       }
 
       // Check for text
-      if (insideComment && (match = buffer.match(/^[^\}]*?(?=\})/))) {
+      if ((match = buffer.match(/^[^\n\{\}]+/))) {
         yield { type: "TEXT", value: match[0].trim() };
         buffer = buffer.slice(match[0].length);
         continue;
@@ -81,6 +85,9 @@ export class Tokenizer {
 
       if (buffer.length === 0 && done) {
         break;
+      } else {
+        yield { type: "UNPARSED", value: buffer };
+        return;
       }
     }
   }
