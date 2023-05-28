@@ -42,7 +42,7 @@
     }
 }
 
-start = gs:(game newline*)* EOF {return gs.map(function(g) { return g[0]})}
+start = newline* g:game newline* { return g}
 
 game = 
     whitespace*
@@ -51,7 +51,7 @@ game =
     h:headers? 
     c1:comments? 
     whitespace* 
-    mr:(m:movetext whitespace+ r:result {return [m, r]} / r:result {return [null, r]}) 
+    mr:(m:movetext whitespace+ r:result? {return [m, r]} / r:result {return [null, r]}) 
     whitespace* {return make_game(c0, h, c1, mr[0], mr[1])}
 
 EOF = !.
