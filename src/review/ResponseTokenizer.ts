@@ -12,6 +12,8 @@ export interface Token {
   type: TokenType;
   value: string;
 }
+const MOVE_REGEX =
+  /^(O-O-O|O-O|([a-h][1-8]|[NBRQK][a-h]?x?)[a-h][1-8](=[NBRQ])?[\+#]?|[a-h]x[a-h][1-8]|([a-h][1-8])?=[NBRQ])(\s|$)\s*/;
 
 export class ResponseTokenizer {
   static async *tokenize(
@@ -20,7 +22,6 @@ export class ResponseTokenizer {
     const decoder = new TextDecoder("utf-8");
     let reader = stream.getReader();
     let buffer = "";
-    //    let insideComment = false;
     let done = false;
 
     while (true) {
@@ -64,12 +65,8 @@ export class ResponseTokenizer {
         continue;
       }
 
-      // Check for move
-      if (
-        (match = buffer.match(
-          /^(O-O-O|O-O|[a-h][1-8][\+#]?|N[a-h][1-8][\+#]?|B[a-h][1-8][\+#]?|R[a-h][1-8][\+#]?|Q[a-h][1-8][\+#]?|K[a-h][1-8][\+#]?)\s*/
-        ))
-      ) {
+      // Check for moves
+      if ((match = buffer.match(MOVE_REGEX))) {
         yield { type: "MOVE", value: match[0].trim() };
         buffer = buffer.slice(match[0].length);
         continue;
@@ -81,6 +78,7 @@ export class ResponseTokenizer {
         buffer = buffer.slice(match[0].length);
         continue;
       }
+
       if (buffer.length === 0) {
         if (done) {
           break;

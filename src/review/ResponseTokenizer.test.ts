@@ -82,6 +82,35 @@ test("Tokenizer handles overall description", async () => {
   ]);
 });
 
+test("Tokenizer handles separated text", async () => {
+  const stream = createTestStream([
+    "Overall game ",
+    "description.\n\n1. e4 {White's move} e5 {Black's move}",
+  ]);
+
+  const tokens = [];
+
+  for await (let token of ResponseTokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "TEXT", value: "Overall game" },
+    { type: "TEXT", value: "description." },
+    { type: "INDEX", value: "1." },
+
+    { type: "MOVE", value: "e4" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "White's move" },
+    { type: "CLOSE_COMMENT", value: "}" },
+
+    { type: "MOVE", value: "e5" },
+    { type: "OPEN_COMMENT", value: "{" },
+    { type: "TEXT", value: "Black's move" },
+    { type: "CLOSE_COMMENT", value: "}" },
+  ]);
+});
+
 test("Tokenizer handles broken input", async () => {
   const stream = createTestStream(["1. e4 {This comment is not closed\n"]);
   const tokens = [];
@@ -156,5 +185,38 @@ test("Tokenizer handles moves without comments", async () => {
     { type: "MOVE", value: "e4" },
     { type: "INDEX", value: "2." },
     { type: "MOVE", value: "Nf3" },
+  ]);
+});
+
+test("Tokenizer handles simple pawn moves", async () => {
+  const stream = createTestStream(["1. e4 e5\n2. d4 d5\n"]);
+  const tokens = [];
+
+  for await (let token of ResponseTokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "e4" },
+    { type: "MOVE", value: "e5" },
+    { type: "INDEX", value: "2." },
+    { type: "MOVE", value: "d4" },
+    { type: "MOVE", value: "d5" },
+  ]);
+});
+
+test("Tokenizer handles captures and promotions", async () => {
+  const stream = createTestStream(["1. exd5 e8=Q\n"]);
+  const tokens = [];
+
+  for await (let token of ResponseTokenizer.tokenize(stream)) {
+    tokens.push(token);
+  }
+
+  expect(tokens).toEqual([
+    { type: "INDEX", value: "1." },
+    { type: "MOVE", value: "exd5" },
+    { type: "MOVE", value: "e8=Q" },
   ]);
 });

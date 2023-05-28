@@ -18,6 +18,12 @@ const nextConfig = {
       });
     }
 
+    // Add pegjs-loader rule here
+    config.module.rules.push({
+      test: /\.pegjs$/,
+      loader: "pegjs-loader",
+    });
+
     return config;
   },
 };
