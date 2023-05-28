@@ -17,8 +17,7 @@ const nextConfig = {
         use: { loader: "worker-loader" },
       });
     }
-
-    // Add pegjs-loader rule here
+    // Add rule for .pegjs files
     config.module.rules.push({
       test: /\.pegjs$/,
       loader: "pegjs-loader",
