@@ -18,6 +18,7 @@ import {
 } from "@/hooks/UseChessboardState";
 import Chessboard from "@/components/Chessboard";
 import { parseReview } from "@/review/ReviewParser";
+import LoadingIndicator from "@/components/LoadingIndicator";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -43,6 +44,11 @@ const Review = () => {
   const [evaluatedGame, setEvaluatedGame] = useState<EvaluatedGame | null>(
     null
   );
+
+  const [processedMoveIndex, setProcessedMoveIndex] = useState<number>(0);
+
+  const totalMoves = evaluatedGame?.moves.length || 0;
+  //const currentMove = chessboardState.moveIndex || 0;
 
   const getCurrentMoveDescription = (): string | null => {
     if (
@@ -77,6 +83,7 @@ const Review = () => {
       setEvaluatedGame(null);
       setMoveDescriptions([]);
       setOverallDescription(null);
+      setProcessedMoveIndex(0);
 
       try {
         const gameResponse = await axios.post("/api/fetchGame", {
@@ -88,6 +95,8 @@ const Review = () => {
         chessboardState.loadGame(game);
 
         setLoadingMessage("Evaluating game...");
+        // TODO: Turn this into a stream.  Set the evaluations incrementally
+        // and then update setProcessedMoveIndex.
         const evaluatedGame: EvaluatedGame = await evaluateGame(
           game,
           engine,
@@ -117,6 +126,9 @@ const Review = () => {
               ...moveDescriptions,
               item as MoveDescription,
             ]);
+            setProcessedMoveIndex(
+              (processedMoveIndex) => processedMoveIndex + 1
+            );
           }
         }
       } catch (error) {
@@ -155,10 +167,16 @@ const Review = () => {
                 <GameInputForm
                   onSubmit={handleSubmit}
                   isLoading={isLoading}
-                  loadingMessage={loadingMessage}
                   gameId={gameId}
                   setGameId={setGameId}
                 />
+                {isLoading && (
+                  <LoadingIndicator
+                    loadingMessage={loadingMessage}
+                    progress={processedMoveIndex}
+                    maxProgress={totalMoves}
+                  />
+                )}
               </div>
 
               <Chessboard chessboardState={chessboardState} />

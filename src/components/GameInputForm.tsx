@@ -2,13 +2,10 @@
 
 import React, { FormEvent } from "react";
 import styles from "../styles/GameInputForm.module.css";
-import classNames from "classnames";
 
 interface GameInputFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
-  loadingMessage: string;
-
   gameId: string;
   setGameId: (value: string) => void;
 }
@@ -16,7 +13,6 @@ interface GameInputFormProps {
 const GameInputForm: React.FC<GameInputFormProps> = ({
   onSubmit,
   isLoading,
-  loadingMessage,
   gameId,
   setGameId,
 }) => (
@@ -45,13 +41,6 @@ const GameInputForm: React.FC<GameInputFormProps> = ({
         Review
       </button>
     </form>
-    <p
-      className={classNames(styles.loadingMessage, {
-        [styles.hidden]: !loadingMessage,
-      })}
-    >
-      {loadingMessage || " "}
-    </p>
   </div>
 );
 
