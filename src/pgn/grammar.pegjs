@@ -51,8 +51,9 @@ game =
     h:headers? 
     c1:comments? 
     whitespace* 
-    mr:(m:movetext whitespace+ r:result? {return [m, r]} / r:result {return [null, r]}) 
-    whitespace* {return make_game(c0, h, c1, mr[0], mr[1])}
+    m:movetext
+    r:(whitespace+ r:result? {return r})? 
+    whitespace* {return make_game(c0, h, c1, m, r)}
 
 EOF = !.
 double_quote = '"'
