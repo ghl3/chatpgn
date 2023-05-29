@@ -5,7 +5,7 @@ import {
 } from "eventsource-parser";
 import { CreateCompletionRequest } from "openai";
 
-export async function OpenAIStream(payload: CreateCompletionRequest) {
+export async function OpenAIStream(request: CreateCompletionRequest) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -19,7 +19,7 @@ export async function OpenAIStream(payload: CreateCompletionRequest) {
         Authorization: `Bearer ${process.env.OPEN_AI_KEY ?? ""}`,
       },
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(request),
     });
   } catch (error) {
     // Log the error and re-throw to exit the function

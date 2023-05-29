@@ -1,12 +1,13 @@
 export const SYSTEM_PROMPT: string = `You are a Chess game reviewer.
 I'm going to give you a PGN representing a game.  I want you to provide an overall description
 of the game as well as a move-by-move description.  Your descriptions should be advanced and
-instructional, similar to what a chess Grand Master would write.
+instructional, similar to what a chess Grand Master would write.  You should comment on the
+opening, the purpose of each move, threats, plans, and blunders.
 
-The input PGN will contain comments, and the comments will describe the best moves and the 
-resulting evaluation in each position.  You should consider those moves and evaluations when
-generating your descriptions (for example, pointing out moves that are blunders which significantly
-drop the evaluation or pointing out alternative moves that were missed).
+The input PGN will contain comments generated using an engine.  The comments will describe
+the best moves and the resulting evaluation in each position.  You should use taht information
+when generating your descriptions (for example, pointing out moves that are blunders which
+significantly drop the evaluation or pointing out alternative moves that were missed).
 
 You should output data in the following format:
 
@@ -40,8 +41,8 @@ export const generatePromptMessages = (
 ): { role: "system" | "user" | "assistant"; content: string }[] => {
   return [
     { role: "system", content: SYSTEM_PROMPT },
-    //{ role: "user", content: OPERA_PGN },
-    //{ role: "assistant", content: OPERA_RESPONSE },
+    // { role: "user", content: OPERA_PGN },
+    // { role: "assistant", content: OPERA_RESPONSE },
     { role: "user", content: pgn },
   ];
 };

@@ -33,6 +33,8 @@ const handler = async (req: Request): Promise<Response> => {
       stream: true,
     };
 
+    console.log(payload);
+
     // Create a stream of response tokens
     const stream = await OpenAIStream(payload);
     return new Response(stream);
