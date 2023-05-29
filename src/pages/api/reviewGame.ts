@@ -1,10 +1,7 @@
 // pages/api/annotatedPgn.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { Configuration, OpenAIApi } from "openai";
 import { generatePromptMessages } from "@/review/prompts";
-import { ReviewedGame, parseGameText } from "@/review/ReviewedGame";
 import { createEvaluatedPgn } from "@/review/PgnUtils";
-import { RESPONSE as OPERA_RESPONSE } from "@/data/games/OperaGame";
 import { OpenAIStream } from "@/utils/OpenAiStream";
 //import { OpenAIStream } from "@/utils/OpenAiStream";
 
