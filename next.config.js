@@ -11,16 +11,21 @@ const nextConfig = {
     );
     config.resolve.alias["@/pages"] = path.join(__dirname, "src/pages");
 
-    if (!isServer) {
-      config.module.rules.push({
-        test: /\.worker\.js$/,
-        use: { loader: "worker-loader" },
-      });
-    }
+    //if (!isServer) {
+    //  config.module.rules.push({
+    //    test: /\.worker\.js$/,
+    //    use: { loader: "worker-loader" },
+    //  });
+    // }
     // Add rule for .pegjs files
     config.module.rules.push({
       test: /\.pegjs$/,
       loader: "pegjs-loader",
+      options: {
+        cache: true,
+        optimize: "size",
+        allowedStartRules: ["start", "game", "movetext"],
+      },
     });
 
     return config;

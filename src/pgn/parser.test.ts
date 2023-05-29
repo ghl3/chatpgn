@@ -50,4 +50,18 @@ describe("PGN Parser", () => {
 
     expect(() => pgnParser.parse(invalidPgn)).toThrow();
   });
+
+  it("parses moves correctly", () => {
+    //var parser = peg.generate("start = ('a' / 'b')+");
+
+    const pgn = "1. e4 {comment 1} e5 {comment 2}";
+    const result = pgnParser.parseMoves(pgn);
+
+    console.log(result);
+
+    expect(result).toEqual([
+      { comments: [{ text: "comment 1" }], move: "e4", move_number: 1 },
+      { comments: [{ text: "comment 2" }], move: "e5" },
+    ]);
+  });
 });

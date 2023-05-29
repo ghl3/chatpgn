@@ -1,3 +1,19 @@
+const pegjs = require("pegjs");
+const fs = require("fs");
+
+module.exports = {
+  process(sourceText, sourcePath, options) {
+    const grammar = fs.readFileSync(sourcePath, { encoding: "utf8" });
+    const parserSource = pegjs.generate(grammar, {
+      output: "source",
+      format: "commonjs",
+      allowedStartRules: ["start", "game", "movetext"],
+    });
+    return { code: parserSource };
+  },
+};
+
+/*
 const fs = require("fs");
 
 module.exports = {
@@ -14,3 +30,4 @@ module.exports = {
     };
   },
 };
+*/

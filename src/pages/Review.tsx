@@ -10,18 +10,14 @@ import { evaluateGame } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameInputForm from "@/components/GameInputForm";
 import PositionDescription from "@/components/PositionDescription";
-import {
-  MoveDescription,
-  getMoveDescriptions,
-  parseGameText,
-} from "@/review/ReviewedGame";
+import { MoveDescription } from "@/review/ReviewedGame";
 import { useRouter } from "next/router";
 import {
   ChessboardState,
   useChessboardState,
 } from "@/hooks/UseChessboardState";
 import Chessboard from "@/components/Chessboard";
-import { parseAnnotationStream } from "@/review/ResponseTokenizer";
+import { parseReview } from "@/review/ReviewParser";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
@@ -121,13 +117,11 @@ const Review = () => {
           throw new Error("Review response is null");
         }
 
-        let firstItem = true;
-        for await (const item of parseAnnotationStream(reviewResponse.body)) {
-          if (firstItem) {
+        for await (const item of parseReview(reviewResponse.body)) {
+          if (item.kind === "comment") {
             // The first item is the overall description
-            setOverallDescription(item as string);
-            firstItem = false;
-          } else {
+            setOverallDescription(item.description);
+          } else if (item.kind === "move") {
             // Subsequent items are move descriptions
             setMoveDescriptions((moveDescriptions) => [
               ...moveDescriptions,
@@ -135,28 +129,6 @@ const Review = () => {
             ]);
           }
         }
-
-        /*
-        let fullText = [];
-
-        // Do the parsing here, it's easier
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) {
-            break;
-          }
-
-          const text = new TextDecoder("utf-8").decode(value);
-          fullText.push(text);
-          console.log(text);
-        }
-
-        const response = fullText.join("");
-        const reviewedGame = parseGameText(response);
-        setMoveDescriptions(getMoveDescriptions(reviewedGame));
-        */
-        setOverallDescription(""); //reviewedGame.overallDescription);
       } catch (error) {
         console.error("Error fetching the game data:", error);
       } finally {

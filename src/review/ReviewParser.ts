@@ -3,7 +3,7 @@ import { MoveDescription, OverallDescription } from "@/review/ReviewedGame";
 import * as pgnParser from "@/pgn/parser";
 
 interface TaggedOverallDescription extends OverallDescription {
-  kind: "overall";
+  kind: "comment";
 }
 
 interface TaggedMoveDescription extends MoveDescription {
@@ -87,7 +87,7 @@ function* parseLine(
     // If the line could not be parsed, return it as text
     yield {
       description: line, // Assuming `OverallDescription` has a `text` property
-      kind: "overall",
+      kind: "comment",
     };
   }
 }

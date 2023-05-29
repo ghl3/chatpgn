@@ -1,5 +1,6 @@
-import pegjs from "peggy";
-import grammar from "./grammar.pegjs";
+//import pegjs from "peggy";
+//import grammar from "./grammar.pegjs";
+import parser from "./grammar.pegjs";
 
 export type Game = {
   comments_above_header?: Comment[];
@@ -38,7 +39,20 @@ export type Command = {
   values: string[];
 };
 
-const parser = pegjs.generate(grammar);
+export const parse = (s: string): Game => parser.parse(s);
+
+export const parseMoves = (s: string): Move[] =>
+  parser.parse(s, { startRule: "movetext" });
+
+/*
+console.log("Type", typeof grammar);
+console.log("Grammar: ", grammar);
+
+console.log(grammar.parse("1. e4 e5"));
+
+const parser = pegjs.generate(grammar, {
+  allowedStartRules: ["start", "game", "movetext"],
+});
 
 export const parse = (s: string): Game => parser.parse(s);
 
@@ -48,3 +62,4 @@ export const parseMoves = (s: string): Move[] =>
 export default {
   parse,
 };
+*/
