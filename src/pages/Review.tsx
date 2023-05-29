@@ -19,11 +19,12 @@ import {
 import Chessboard from "@/components/Chessboard";
 import { parseReview } from "@/review/ReviewParser";
 import LoadingIndicator from "@/components/LoadingIndicator";
+import EvaluatedPosition from "@/components/EvaluatedPosition";
 
 // Only run the engine on the client.
 let engine: Engine | null = null;
 if (typeof window !== "undefined") {
-  engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 1, false);
+  engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false);
 }
 
 const Review = () => {
@@ -103,6 +104,7 @@ const Review = () => {
           engine,
           isDebug
         )) {
+          console.log("Evaluated position", evaluatedPosition);
           evaluatedGame.evaluatedPositions.push(evaluatedPosition);
           setEvaluatedGame(evaluatedGame);
         }
@@ -189,12 +191,18 @@ const Review = () => {
               <Chessboard chessboardState={chessboardState} />
 
               <div className="row">
-                <PositionDescription
+                <EvaluatedPosition
                   evaluatedPosition={
                     evaluatedGame?.evaluatedPositions[
                       chessboardState.moveIndex
                     ] || null
                   }
+                  isLoading={isLoading}
+                />
+              </div>
+
+              <div className="row">
+                <PositionDescription
                   description={currentMoveDescription}
                   isLoading={isLoading}
                 />
