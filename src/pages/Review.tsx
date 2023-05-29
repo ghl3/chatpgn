@@ -53,20 +53,10 @@ const Review = () => {
       return null;
     }
 
-    if (overallDescription == null || moveDescriptions == null) {
-      return null;
-    }
-
     const moveIndex = chessboardState.moveIndex;
     if (moveIndex == 0) {
       return overallDescription;
-    } else if (moveDescriptions == null) {
-      console.error("Move descriptions are null");
-      return null;
     } else if (moveDescriptions.length < moveIndex) {
-      console.error(
-        `Move descriptions length is ${moveDescriptions.length} but move index is ${moveIndex}`
-      );
       return null;
     } else {
       return moveDescriptions[moveIndex - 1].description;
@@ -85,6 +75,8 @@ const Review = () => {
       setLoadingMessage("Fetching game...");
       chessboardState.clearGame();
       setEvaluatedGame(null);
+      setMoveDescriptions([]);
+      setOverallDescription(null);
 
       try {
         const gameResponse = await axios.post("/api/fetchGame", {
@@ -104,7 +96,7 @@ const Review = () => {
         setEvaluatedGame(evaluatedGame);
 
         setLoadingMessage("Annotating game...");
-        const reviewResponse = await fetch("/api/reviewGameStream", {
+        const reviewResponse = await fetch("/api/reviewGame", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -119,10 +111,8 @@ const Review = () => {
 
         for await (const item of parseReview(reviewResponse.body)) {
           if (item.kind === "comment") {
-            // The first item is the overall description
             setOverallDescription(item.description);
           } else if (item.kind === "move") {
-            // Subsequent items are move descriptions
             setMoveDescriptions((moveDescriptions) => [
               ...moveDescriptions,
               item as MoveDescription,
@@ -174,16 +164,15 @@ const Review = () => {
               <Chessboard chessboardState={chessboardState} />
 
               <div className="row">
-                {evaluatedGame && (
-                  <PositionDescription
-                    evaluatedPosition={
-                      evaluatedGame?.evaluatedPositions[
-                        chessboardState.moveIndex
-                      ] || null
-                    }
-                    description={currentMoveDescription}
-                  />
-                )}
+                <PositionDescription
+                  evaluatedPosition={
+                    evaluatedGame?.evaluatedPositions[
+                      chessboardState.moveIndex
+                    ] || null
+                  }
+                  description={currentMoveDescription}
+                  isLoading={isLoading}
+                />
               </div>
             </div>
           </div>
