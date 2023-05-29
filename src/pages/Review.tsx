@@ -151,7 +151,7 @@ const Review = () => {
   // Meausre the progress
   const maxProgress = 2 * (chessboardState.game?.positions.length || 0) + 1;
   const progress =
-    (evaluatedGame?.moves.length || 0) +
+    (evaluatedGame?.evaluatedPositions.length || 0) +
     moveDescriptions.length +
     (overallDescription ? 1 : 0);
 
