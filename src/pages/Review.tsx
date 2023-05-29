@@ -6,7 +6,7 @@ import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import styles from "../styles/Review.module.css";
 import { Engine } from "@/engine/Engine";
-import { evaluateGame } from "@/engine/Evaluate";
+import { evaluatePositions } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameInputForm from "@/components/GameInputForm";
 import PositionDescription from "@/components/PositionDescription";
@@ -45,11 +45,6 @@ const Review = () => {
     null
   );
 
-  const [processedMoveIndex, setProcessedMoveIndex] = useState<number>(0);
-
-  const totalMoves = evaluatedGame?.moves.length || 0;
-  //const currentMove = chessboardState.moveIndex || 0;
-
   const getCurrentMoveDescription = (): string | null => {
     if (
       chessboardState == null ||
@@ -83,7 +78,6 @@ const Review = () => {
       setEvaluatedGame(null);
       setMoveDescriptions([]);
       setOverallDescription(null);
-      setProcessedMoveIndex(0);
 
       try {
         const gameResponse = await axios.post("/api/fetchGame", {
@@ -95,14 +89,23 @@ const Review = () => {
         chessboardState.loadGame(game);
 
         setLoadingMessage("Evaluating game...");
-        // TODO: Turn this into a stream.  Set the evaluations incrementally
-        // and then update setProcessedMoveIndex.
-        const evaluatedGame: EvaluatedGame = await evaluateGame(
+        const evaluatedGame: EvaluatedGame = {
+          id: game.id,
+          white: game.white,
+          black: game.black,
+          moves: game.moves,
+          evaluatedPositions: [],
+        };
+        setEvaluatedGame(evaluatedGame);
+
+        for await (const evaluatedPosition of evaluatePositions(
           game,
           engine,
           isDebug
-        );
-        setEvaluatedGame(evaluatedGame);
+        )) {
+          evaluatedGame.evaluatedPositions.push(evaluatedPosition);
+          setEvaluatedGame(evaluatedGame);
+        }
 
         setLoadingMessage("Annotating game...");
         const reviewResponse = await fetch("/api/reviewGame", {
@@ -126,9 +129,6 @@ const Review = () => {
               ...moveDescriptions,
               item as MoveDescription,
             ]);
-            setProcessedMoveIndex(
-              (processedMoveIndex) => processedMoveIndex + 1
-            );
           }
         }
       } catch (error) {
@@ -147,6 +147,13 @@ const Review = () => {
       setOverallDescription,
     ]
   );
+
+  // Meausre the progress
+  const maxProgress = 2 * (chessboardState.game?.positions.length || 0) + 1;
+  const progress =
+    (evaluatedGame?.moves.length || 0) +
+    moveDescriptions.length +
+    (overallDescription ? 1 : 0);
 
   return (
     <>
@@ -173,8 +180,8 @@ const Review = () => {
                 {isLoading && (
                   <LoadingIndicator
                     loadingMessage={loadingMessage}
-                    progress={processedMoveIndex}
-                    maxProgress={totalMoves}
+                    progress={progress}
+                    maxProgress={maxProgress}
                   />
                 )}
               </div>
