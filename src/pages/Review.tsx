@@ -190,16 +190,6 @@ const Review = () => {
 
             <div className="four wide column">
               <div className="ui one column grid">
-                <div className="row  ">
-                  {isLoading && (
-                    <LoadingIndicator
-                      loadingMessage={loadingMessage}
-                      progress={progress}
-                      maxProgress={maxProgress}
-                    />
-                  )}
-                </div>
-
                 <div className="row ">
                   <EvaluatedPosition
                     evaluatedPosition={
@@ -216,6 +206,16 @@ const Review = () => {
                     description={currentMoveDescription}
                     isLoading={isLoading}
                   />
+                </div>
+
+                <div className="row  ">
+                  {isLoading && (
+                    <LoadingIndicator
+                      loadingMessage={loadingMessage}
+                      progress={progress}
+                      maxProgress={maxProgress}
+                    />
+                  )}
                 </div>
               </div>
             </div>
