@@ -1,0 +1,19 @@
+/* src/styles/LoadingIndicator.module.css */
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto; /* this will horizontally center .evaluatedPositionContainer within the row */
+  margin-right: auto; /* this will horizontally center .evaluatedPositionContainer within the row */
+}
+
+.loadingMessage {
+  margin-bottom: 1rem;
+  color: #ddd; /* Change color to match your design */
+}
+
+.progressBar {
+  width: 100%; /* This ensures the progress bar spans the full width of the container */
+}

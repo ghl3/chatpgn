@@ -1,3 +1,5 @@
+// src/pages/Review.tsx
+
 import React, { useState, useCallback } from "react";
 
 import Head from "next/head";
@@ -181,26 +183,24 @@ const Review = () => {
           </div>
 
           <div className="ui stackable center aligned grid">
-            <div className="four wide column"> </div>
+            <div className="two wide column"> </div>
             <div className="eight wide column">
               <Chessboard chessboardState={chessboardState} />
             </div>
 
             <div className="four wide column">
               <div className="ui one column grid">
-                {isLoading && (
-                  <div className="row">
-                    <div className={styles.loadingContainer}>
-                      <LoadingIndicator
-                        loadingMessage={loadingMessage}
-                        progress={progress}
-                        maxProgress={maxProgress}
-                      />
-                    </div>
-                  </div>
-                )}
+                <div className="row  ">
+                  {isLoading && (
+                    <LoadingIndicator
+                      loadingMessage={loadingMessage}
+                      progress={progress}
+                      maxProgress={maxProgress}
+                    />
+                  )}
+                </div>
 
-                <div className="row">
+                <div className="row ">
                   <EvaluatedPosition
                     evaluatedPosition={
                       evaluatedGame?.evaluatedPositions[
@@ -211,7 +211,7 @@ const Review = () => {
                   />
                 </div>
 
-                <div className="row">
+                <div className="row  ">
                   <PositionDescription
                     description={currentMoveDescription}
                     isLoading={isLoading}
@@ -219,6 +219,7 @@ const Review = () => {
                 </div>
               </div>
             </div>
+            <div className="two wide column"> </div>
           </div>
         </div>
       </main>

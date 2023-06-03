@@ -1,3 +1,5 @@
+/* src/styles/Review.module.css */
+
 .GameReview {
   background: #1e1e1e;
   color: white;
@@ -22,17 +24,6 @@
   font-weight: bold;
   margin: 0;
   padding: 0;
-}
-
-.loadingContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loadingMessage {
-  min-height: 1rem;
-  color: #2c3e50;
 }
 
 .hidden {

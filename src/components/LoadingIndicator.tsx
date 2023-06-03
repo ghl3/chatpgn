@@ -1,4 +1,4 @@
-// components/LoadingIndicator.tsx
+// src/components/LoadingIndicator.tsx
 
 import React from "react";
 import styles from "../styles/LoadingIndicator.module.css";
