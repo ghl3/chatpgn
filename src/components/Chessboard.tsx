@@ -1,15 +1,70 @@
-// components/ChessboardWithControls.tsx
+// components/Chessboard.tsx
 
 import React, { useCallback, useState } from "react";
 import { Chessboard as ReactChessboard } from "react-chessboard";
-import GameControlButtons from "./GameControlButtons";
-import styles from "../styles/Review.module.css";
+import styles from "../styles/Chessboard.module.css";
 import useArrowKeys from "@/hooks/UseArrowKeys";
 import { ChessboardState } from "@/hooks/UseChessboardState";
 
 interface ChessboardProps {
   chessboardState: ChessboardState;
 }
+
+interface GameControlButtonsProps {
+  isDisabled: boolean;
+  handleJumpToStart: () => void;
+  handleLeftClick: () => void;
+  handleRightClick: () => void;
+  handleJumpToEnd: () => void;
+  handleFlipBoard: () => void;
+}
+
+const GameControlButtons: React.FC<GameControlButtonsProps> = ({
+  isDisabled,
+  handleJumpToStart,
+  handleLeftClick,
+  handleRightClick,
+  handleJumpToEnd,
+  handleFlipBoard,
+}) => (
+  <div className={styles.buttonRow}>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleJumpToStart}
+      disabled={isDisabled}
+    >
+      &laquo;
+    </button>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleLeftClick}
+      disabled={isDisabled}
+    >
+      &larr;
+    </button>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleRightClick}
+      disabled={isDisabled}
+    >
+      &rarr;
+    </button>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleJumpToEnd}
+      disabled={isDisabled}
+    >
+      &raquo;
+    </button>
+    <button
+      className={`${styles.localButton} ui small button`}
+      onClick={handleFlipBoard}
+      disabled={isDisabled}
+    >
+      Flip Board
+    </button>
+  </div>
+);
 
 const Chessboard: React.FC<ChessboardProps> = ({
   chessboardState: chessboardData,
@@ -71,40 +126,42 @@ const Chessboard: React.FC<ChessboardProps> = ({
 
   return (
     <>
-      <div className="row">
-        <p className={styles.playerName}>
-          {orientation === "white"
-            ? chessboardData.game?.black
-            : chessboardData.game?.white}
-        </p>
-      </div>
+      <div className={styles.container}>
+        <div className={styles.playerNameRow}>
+          <p className={styles.playerName}>
+            {orientation === "white"
+              ? chessboardData.game?.black
+              : chessboardData.game?.white}
+          </p>
+        </div>
 
-      <div className={styles.Chessboard}>
-        <ReactChessboard
-          position={chessboardData.getPositionFen()}
-          customDarkSquareStyle={{ backgroundColor: "#34495e" }}
-          boardWidth={chessboardData.boardSize}
-          areArrowsAllowed={true}
-          boardOrientation={orientation}
+        <div className={styles.Chessboard}>
+          <ReactChessboard
+            position={chessboardData.getPositionFen()}
+            customDarkSquareStyle={{ backgroundColor: "#34495e" }}
+            boardWidth={chessboardData.boardSize}
+            areArrowsAllowed={true}
+            boardOrientation={orientation}
+          />
+        </div>
+
+        <div className={styles.playerNameRow}>
+          <p className={styles.playerName}>
+            {orientation === "white"
+              ? chessboardData.game?.white
+              : chessboardData.game?.black}
+          </p>
+        </div>
+
+        <GameControlButtons
+          isDisabled={controlsDisabled}
+          handleJumpToStart={handleJumpToStart}
+          handleLeftClick={handleLeftClick}
+          handleRightClick={handleRightClick}
+          handleJumpToEnd={handleJumpToEnd}
+          handleFlipBoard={handleFlipBoard}
         />
       </div>
-
-      <div className="row">
-        <p className={styles.playerName}>
-          {orientation === "white"
-            ? chessboardData.game?.white
-            : chessboardData.game?.black}
-        </p>
-      </div>
-
-      <GameControlButtons
-        isDisabled={controlsDisabled}
-        handleJumpToStart={handleJumpToStart}
-        handleLeftClick={handleLeftClick}
-        handleRightClick={handleRightClick}
-        handleJumpToEnd={handleJumpToEnd}
-        handleFlipBoard={handleFlipBoard}
-      />
     </>
   );
 };

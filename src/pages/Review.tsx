@@ -168,48 +168,58 @@ const Review = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.GameReview}>
-        <div className="ui container grid">
-          <div className="four wide centered column"></div>
-          <div className="eight wide centered column">
-            <div className="ui center aligned one column grid">
-              <div className="row">
-                <GameInputForm
-                  onSubmit={handleSubmit}
-                  isLoading={isLoading}
-                  gameId={gameId}
-                  setGameId={setGameId}
-                />
-                {isLoading && (
-                  <LoadingIndicator
-                    loadingMessage={loadingMessage}
-                    progress={progress}
-                    maxProgress={maxProgress}
-                  />
-                )}
-              </div>
+        <div className="ui container">
+          <div className="ui one column stackable center aligned grid">
+            <div className="middle aligned row">
+              <GameInputForm
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+                gameId={gameId}
+                setGameId={setGameId}
+              />
+            </div>
+          </div>
 
+          <div className="ui stackable center aligned grid">
+            <div className="four wide column"> </div>
+            <div className="eight wide column">
               <Chessboard chessboardState={chessboardState} />
+            </div>
 
-              <div className="row">
-                <EvaluatedPosition
-                  evaluatedPosition={
-                    evaluatedGame?.evaluatedPositions[
-                      chessboardState.moveIndex
-                    ] || null
-                  }
-                  isLoading={isLoading}
-                />
-              </div>
+            <div className="four wide column">
+              <div className="ui one column grid">
+                {isLoading && (
+                  <div className="row">
+                    <div className={styles.loadingContainer}>
+                      <LoadingIndicator
+                        loadingMessage={loadingMessage}
+                        progress={progress}
+                        maxProgress={maxProgress}
+                      />
+                    </div>
+                  </div>
+                )}
 
-              <div className="row">
-                <PositionDescription
-                  description={currentMoveDescription}
-                  isLoading={isLoading}
-                />
+                <div className="row">
+                  <EvaluatedPosition
+                    evaluatedPosition={
+                      evaluatedGame?.evaluatedPositions[
+                        chessboardState.moveIndex
+                      ] || null
+                    }
+                    isLoading={isLoading}
+                  />
+                </div>
+
+                <div className="row">
+                  <PositionDescription
+                    description={currentMoveDescription}
+                    isLoading={isLoading}
+                  />
+                </div>
               </div>
             </div>
           </div>
-          <div className="four wide centered column"></div>
         </div>
       </main>
     </>

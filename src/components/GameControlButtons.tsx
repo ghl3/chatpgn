@@ -20,7 +20,7 @@ const GameControlButtons: React.FC<GameControlButtonsProps> = ({
   handleJumpToEnd,
   handleFlipBoard,
 }) => (
-  <div className="ui center aligned basic segment">
+  <div className={styles.buttonRow}>
     <button
       className={`${styles.localButton} ui small button`}
       onClick={handleJumpToStart}

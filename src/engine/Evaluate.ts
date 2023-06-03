@@ -17,7 +17,6 @@ export async function* evaluatePositions(
 
   for (const position of game.positions) {
     const evaluatedPosition = await engine.evaluatePosition(position.fen);
-    console.log("Evaluated position", evaluatedPosition);
     yield evaluatedPosition;
   }
 }

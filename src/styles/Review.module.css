@@ -24,6 +24,12 @@
   padding: 0;
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .loadingMessage {
   min-height: 1rem;
   color: #2c3e50;
