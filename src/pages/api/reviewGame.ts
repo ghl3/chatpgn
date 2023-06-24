@@ -23,10 +23,11 @@ const handler = async (req: Request): Promise<Response> => {
     const payload = {
       model: model,
       n: 1,
-      // The max number of tokens is the number of tokens for the completion.
-      // The max number of tokens for the prompt messages plus the completion is 4097.
-      // So, max tokens below must be defined such that, when added to the number
-      // of tokens in the message, it doesn't exceed 4097.
+      // max_tokens is the number of tokens allowed for the completion.
+      // The total number of tokens, including both the prompt and the
+      // completion, is 4097.  So, max_tokens below must be defined such
+      // that, when added to the number of tokens in the prompt, it doesn't
+      // exceed 4097.
       max_tokens: 2048,
       temperature: 0.5,
       messages: promptMessages,
