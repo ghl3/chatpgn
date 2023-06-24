@@ -1,3 +1,5 @@
+// src/components/EvaluatedPosition.tsx
+
 import React from "react";
 import { EvaluatedPosition as EvaluatedPositionType } from "@/chess/EvaluatedPosition";
 import { EvaluationUtil } from "@/chess/Evaluation";

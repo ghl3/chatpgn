@@ -8,7 +8,6 @@ import { ChessComGameData, parseGame } from "./api/fetchGame";
 import { Game } from "@/chess/Game";
 import styles from "../styles/Review.module.css";
 import { Engine } from "@/engine/Engine";
-import { evaluatePositions } from "@/engine/Evaluate";
 import { EvaluatedGame } from "@/chess/EvaluatedGame";
 import GameInputForm from "@/components/GameInputForm";
 import PositionDescription from "@/components/PositionDescription";
@@ -22,11 +21,18 @@ import Chessboard from "@/components/Chessboard";
 import { parseReview } from "@/review/ReviewParser";
 import LoadingIndicator from "@/components/LoadingIndicator";
 import EvaluatedPosition from "@/components/EvaluatedPosition";
+import { EngineGroup } from "@/engine/EngineGroup";
 
 // Only run the engine on the client.
-let engine: Engine | null = null;
+let engine: EngineGroup | null = null;
 if (typeof window !== "undefined") {
-  engine = new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false);
+  engine = new EngineGroup([
+    new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false),
+    new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false),
+    new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false),
+    new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false),
+    new Engine(new Worker("/stockfish/stockfish.asm.js"), 18, 3, false),
+  ]);
 }
 
 const Review = () => {
@@ -101,11 +107,15 @@ const Review = () => {
         };
         setEvaluatedGame(evaluatedGame);
 
-        for await (const evaluatedPosition of evaluatePositions(
-          game,
-          engine,
-          isDebug
-        )) {
+        // Start evaluating all positions in parallel
+        // using all engines.
+        const evaluatingPositions = [];
+        for (const position of game.positions) {
+          evaluatingPositions.push(engine.get().evaluatePosition(position.fen));
+        }
+
+        // Then, iterate through the positions as they are evaluated.
+        for await (const evaluatedPosition of evaluatingPositions) {
           console.log("Evaluated position", evaluatedPosition);
           evaluatedGame.evaluatedPositions.push(evaluatedPosition);
           setEvaluatedGame(evaluatedGame);
@@ -190,7 +200,11 @@ const Review = () => {
 
             <div className="four wide column">
               <div className="ui one column grid">
-                <div className="row ">
+                <div className="row" style={{ minHeight: 50 }}>
+                  {" "}
+                </div>
+
+                <div className="row">
                   <EvaluatedPosition
                     evaluatedPosition={
                       evaluatedGame?.evaluatedPositions[
@@ -201,14 +215,14 @@ const Review = () => {
                   />
                 </div>
 
-                <div className="row  ">
+                <div className="row">
                   <PositionDescription
                     description={currentMoveDescription}
                     isLoading={isLoading}
                   />
                 </div>
 
-                <div className="row  ">
+                <div className="row">
                   {isLoading && (
                     <LoadingIndicator
                       loadingMessage={loadingMessage}
